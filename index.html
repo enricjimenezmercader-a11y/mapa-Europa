@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa d'Europa - Solapament Perfecte</title>
+    <title>Mapa d'Europa - Calibració Final</title>
     <style>
         body {
             background-color: #f0f0f0;
@@ -29,16 +29,15 @@
 
         /* Estil dels hexàgons */
         .hex-polygon {
-            fill: rgba(0, 0, 0, 0); /* Totalment transparent */
-            /* Magenta per veure l'encaix. Canvia-ho a 'transparent' o '#000000' quan vulguis */
-            stroke: #ff00ff; 
+            fill: rgba(0, 0, 0, 0); /* Totalment transparent per defecte */
+            stroke: #ff00ff; /* Mantenim el magenta temporalment per verificar que quadra al 100% */
             stroke-width: 2.5;
             cursor: pointer;
             transition: fill 0.2s, stroke 0.2s;
         }
 
         .hex-polygon:hover {
-            fill: rgba(0, 150, 255, 0.4); 
+            fill: rgba(0, 150, 255, 0.4); /* Blau semi-transparent en fer hover */
             stroke: #0096ff;
         }
     </style>
@@ -55,16 +54,15 @@
     <script>
         const svg = document.getElementById('hex-grid');
 
-        // --- NOVES VARIABLES RECALIBRADES ---
-        // S'han reduït les mides per evitar l'expansió cap a la dreta i cap avall
+        // --- VALORS CORREGITS I RECALIBRATS ---
         const HEX_HEIGHT = 110.5;  
-        const HEX_WIDTH = 127.6;   
-        const STEP_X = 95.7; 
+        const HEX_WIDTH = 124.0; // Reduït per evitar que s'estiri cap a la dreta   
+        const STEP_X = 93.0;     // Distància horitzontal corregida (HEX_WIDTH * 0.75)
         const STEP_Y = 110.5;       
-        const OFFSET_X = 316;     
-        const OFFSET_Y = 96;      
+        const OFFSET_X = 356;    // Corregit per centrar perfectament de l'esquerra a la dreta
+        const OFFSET_Y = 123;    // Corregit per empènyer la graella avall fins al seu lloc
 
-        // Matriu de coordenades (sense els números)
+        // Graella de coordenades (sense els números visibles)
         const hexData = [
             { id: 1, c: 0, r: 2 }, { id: 2, c: 0, r: 3 }, { id: 3, c: 0, r: 4 }, { id: 4, c: 0, r: 5 },
             { id: 5, c: 1, r: 2 }, { id: 6, c: 1, r: 3 }, { id: 7, c: 1, r: 4 }, { id: 8, c: 1, r: 5 }, { id: 9, c: 1, r: 6 },
@@ -97,9 +95,7 @@
             const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
             polygon.setAttribute("points", pointsStr);
             polygon.setAttribute("class", "hex-polygon");
-            
-            // L'atribut ID et servirà en el futur per saber quin hexàgon s'ha clicat des de JavaScript
-            polygon.setAttribute("data-id", hex.id); 
+            polygon.setAttribute("data-id", hex.id); // Conserva la ID interna pel polígon invisible
 
             svg.appendChild(polygon);
         });
