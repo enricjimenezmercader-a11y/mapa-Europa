@@ -2,32 +2,30 @@
 <html lang="ca">
 <head>
     <meta charset="UTF-8">
-    <title>Mapa Europa - Flat-Topped (CAD Precision)</title>
+    <title>Mapa Europa - Graella CAD</title>
     <style>
         body { margin: 0; background: #000; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         #container { position: relative; width: 1600px; height: 900px; }
         svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        .hex { fill: none; stroke: #ff00ff; stroke-width: 4; }
+        .hex { fill: none; stroke: #ff00ff; stroke-width: 3; }
     </style>
 </head>
 <body>
     <div id="container">
         <img src="Mapa europa-Layout2.jpg" width="1600" height="900" alt="Mapa">
-        <svg viewBox="0 0 1600 900" id="map">
-            </svg>
+        <svg viewBox="0 0 1600 900" id="map"></svg>
     </div>
 
     <script>
         const svg = document.getElementById('map');
         
-        // Paràmetres geomètrics derivats de s = 155px
+        // Paràmetres geomètrics basats en s=155px
         const s = 155; 
-        const W = 2 * s;           // 310
-        const H = Math.sqrt(3) * s; // 268.46
-        const STEP_X = 1.5 * s;     // 232.5
-        const STEP_Y = Math.sqrt(3) * s; // 268.46
+        const H = 268.46; 
+        const STEP_X = 232.5; 
+        const STEP_Y = 268.46; 
         
-        // Punt d'origen (centre del Hex 1 ajustat)
+        // Origen (Ajusta aquests valors per alinear el teu plànol)
         const START_X = 265; 
         const START_Y = 277;
 
@@ -35,7 +33,6 @@
             const x = START_X + (c * STEP_X);
             const y = START_Y + (r * STEP_Y) + (c % 2 !== 0 ? STEP_Y / 2 : 0);
             
-            // Vèrtexs per a Flat-Topped
             const p = [
                 `${x - s/2},${y - H/2}`, `${x + s/2},${y - H/2}`,
                 `${x + s},${y}`, `${x + s/2},${y + H/2}`,
@@ -48,7 +45,7 @@
             svg.appendChild(poly);
         }
 
-        // Matriu de coordenades segons el patró de la teva imatge
+        // Matriu de coordenades (c=columna, r=fila)
         const grid = [
             {c:0, r:0}, {c:0, r:1}, {c:0, r:2},
             {c:1, r:-1}, {c:1, r:0}, {c:1, r:1}, {c:1, r:2},
