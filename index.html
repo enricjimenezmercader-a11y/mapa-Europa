@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa d'Europa - Calibració Final</title>
+    <title>Mapa d'Europa - Lògica Corregida</title>
     <style>
         body {
             background-color: #f0f0f0;
@@ -27,17 +27,16 @@
             background-color: white;
         }
 
-        /* Estil dels hexàgons */
         .hex-polygon {
-            fill: rgba(0, 0, 0, 0); /* Totalment transparent per defecte */
-            stroke: #ff00ff; /* Mantenim el magenta temporalment per verificar que quadra al 100% */
-            stroke-width: 2.5;
+            fill: rgba(0, 0, 0, 0);
+            stroke: #ff00ff; /* Magenta per comprovar el canvi de lògica */
+            stroke-width: 2;
             cursor: pointer;
             transition: fill 0.2s, stroke 0.2s;
         }
 
         .hex-polygon:hover {
-            fill: rgba(0, 150, 255, 0.4); /* Blau semi-transparent en fer hover */
+            fill: rgba(0, 150, 255, 0.4);
             stroke: #0096ff;
         }
     </style>
@@ -54,15 +53,17 @@
     <script>
         const svg = document.getElementById('hex-grid');
 
-        // --- VALORS CORREGITS I RECALIBRATS ---
-        const HEX_HEIGHT = 110.5;  
-        const HEX_WIDTH = 124.0; // Reduït per evitar que s'estiri cap a la dreta   
-        const STEP_X = 93.0;     // Distància horitzontal corregida (HEX_WIDTH * 0.75)
-        const STEP_Y = 110.5;       
-        const OFFSET_X = 356;    // Corregit per centrar perfectament de l'esquerra a la dreta
-        const OFFSET_Y = 123;    // Corregit per empènyer la graella avall fins al seu lloc
+        // --- GEOMETRIA DE L'HEXÀGON REGULAR (Punts plans dalt i baix) ---
+        const HEX_HEIGHT = 120;                            // Alçada exacta calculada de la imatge
+        const HEX_WIDTH = HEX_HEIGHT * (2 / Math.sqrt(3)); // 138.56px (Proporció geomètrica real)
+        
+        const STEP_X = HEX_WIDTH * 0.75;                  // 103.92px (Distància horitzontal entre columnes)
+        const STEP_Y = HEX_HEIGHT;                        // 120px (Distància vertical entre files)
 
-        // Graella de coordenades (sense els números visibles)
+        // Ajust global de coordenades per clavar el primer element
+        const OFFSET_X = 356.5;    
+        const OFFSET_Y = -14; 
+
         const hexData = [
             { id: 1, c: 0, r: 2 }, { id: 2, c: 0, r: 3 }, { id: 3, c: 0, r: 4 }, { id: 4, c: 0, r: 5 },
             { id: 5, c: 1, r: 2 }, { id: 6, c: 1, r: 3 }, { id: 7, c: 1, r: 4 }, { id: 8, c: 1, r: 5 }, { id: 9, c: 1, r: 6 },
@@ -72,17 +73,21 @@
             { id: 26, c: 5, r: 0 }, { id: 27, c: 5, r: 1 }, { id: 28, c: 5, r: 2 }, { id: 29, c: 5, r: 3 }, { id: 30, c: 5, r: 4 }, { id: 31, c: 5, r: 5 }, { id: 32, c: 5, r: 6 },
             { id: 33, c: 6, r: 0 }, { id: 34, c: 6, r: 1 }, { id: 35, c: 6, r: 2 }, { id: 36, c: 6, r: 3 }, { id: 37, c: 6, r: 4 }, { id: 38, c: 6, r: 5 }, { id: 39, c: 6, r: 6 },
             { id: 40, c: 7, r: 0 }, { id: 41, c: 7, r: 1 }, { id: 42, c: 7, r: 2 }, { id: 43, c: 7, r: 3 }, { id: 44, c: 7, r: 4 }, { id: 45, c: 7, r: 5 }, { id: 46, c: 7, r: 6 },
-            { id: 47, c: 8, r: 0 }, { id: 48, c: 8, r: 1 }, { id: 49, c: 8, r: 2 }, { id: 50, c: 8, r: 3 }, { id: 51, c: 8, r: 4 }, { id: 52, c: 8, r: 5 }, { id: 53, c: 8, r: 6 },
+            { id: 47, r: 0, c: 8 }, { id: 48, c: 8, r: 1 }, { id: 49, c: 8, r: 2 }, { id: 50, c: 8, r: 3 }, { id: 51, c: 8, r: 4 }, { id: 52, c: 8, r: 5 }, { id: 53, c: 8, r: 6 },
             { id: 54, c: 9, r: 0 }, { id: 55, c: 9, r: 1 }, { id: 56, c: 9, r: 2 }, { id: 57, c: 9, r: 3 }, { id: 58, c: 9, r: 4 }, { id: 59, c: 9, r: 5 }, { id: 60, c: 9, r: 6 }
         ];
 
         hexData.forEach(hex => {
-            const isShifted = (hex.c % 2 === 0);
-            const verticalShift = isShifted ? (STEP_Y * 0.5) : 0;
+            // REVISIÓ DE LA LÒGICA D'ALTERNANÇA: 
+            // Les columnes PARELLES (0, 2, 4...) estan desplaçades cap avall (positives en Y) respecte a les senars.
+            const isEvenColumn = (hex.c % 2 === 0);
+            const verticalShift = isEvenColumn ? (STEP_Y * 0.5) : 0;
 
+            // Centre de cada hexàgon
             const cx = OFFSET_X + (hex.c * STEP_X);
             const cy = OFFSET_Y + (hex.r * STEP_Y) + verticalShift;
 
+            // Càlcul de vèrtexs idonis basats en el centre (cx, cy)
             const x1 = cx - HEX_WIDTH * 0.25, y1 = cy - HEX_HEIGHT * 0.5;
             const x2 = cx + HEX_WIDTH * 0.25, y2 = cy - HEX_HEIGHT * 0.5;
             const x3 = cx + HEX_WIDTH * 0.5,  y3 = cy;
@@ -95,7 +100,7 @@
             const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
             polygon.setAttribute("points", pointsStr);
             polygon.setAttribute("class", "hex-polygon");
-            polygon.setAttribute("data-id", hex.id); // Conserva la ID interna pel polígon invisible
+            polygon.setAttribute("data-id", hex.id);
 
             svg.appendChild(polygon);
         });
