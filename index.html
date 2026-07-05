@@ -1,1 +1,31 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Imatge Centrada</title>
+    <style>
+        /* Configura el fons blanc i centra el contingut a la pantalla completa */
+        body {
+            background-color: #ffffff;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
 
+        /* Assegura que la imatge sigui responsiva i no desbordi la pantalla */
+        img {
+            max-width: 100%;
+            max-height: 100vh;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body>
+
+    <img src="https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/1225292e58efec2612aeac2879e87f0a3bf1e76c/Mapa%20europa-Layout1.jpg" alt="Mapa d'Europa">
+
+</body>
+</html>
