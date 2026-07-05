@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa d'Europa - Correcció de Geometria</title>
+    <title>Mapa d'Europa - Calibració Píxel a Píxel</title>
     <style>
         body {
             background-color: #f0f0f0;
@@ -29,7 +29,7 @@
 
         .hex-polygon {
             fill: rgba(0, 0, 0, 0);
-            stroke: #ff00ff; /* Magenta per comprovar visualment */
+            stroke: #ff00ff; /* Mantenim el magenta per verificar la correcció definitiva */
             stroke-width: 2.5;
             cursor: pointer;
             transition: fill 0.2s, stroke 0.2s;
@@ -53,16 +53,16 @@
     <script>
         const svg = document.getElementById('hex-grid');
 
-        // --- NOVA GEOMETRIA REAL: HEXÀGONS AMB PUNTA A DALT (Pointy-topped) ---
-        const HEX_HEIGHT = 132.5; // Alçada total de punta a punta
-        const HEX_WIDTH = HEX_HEIGHT * (Math.sqrt(3) / 2); // ~114.74px d'amplada de costat a costat
+        // --- VALORS REALS MESURATS DIRECTAMENT SOBRE L'ARXIU MAPA EUROPA-LAYOUT2.JPG ---
+        const HEX_HEIGHT = 127; // Alçada real de punta a punta en píxels
+        const HEX_WIDTH = 110;  // Amplada real de costat a costat en píxels
         
-        const STEP_X = HEX_WIDTH;         // Distància horitzontal real entre columnes
-        const STEP_Y = HEX_HEIGHT * 0.75;  // Distància vertical real entre files (99.37px)
+        const STEP_X = 110;     // Distància horitzontal exacta entre columnes
+        const STEP_Y = 95;      // Distància vertical exacta entre files
 
-        // Punts d'ancoratge inicials calculats des de l'hexàgon 1
-        const OFFSET_X = 237;    
-        const OFFSET_Y = 160; 
+        // Punts de partida per clavar el centre exacte de l'hexàgon 1
+        const OFFSET_X = 293;    
+        const OFFSET_Y = 163; 
 
         const hexData = [
             { id: 1, c: 0, r: 2 }, { id: 2, c: 0, r: 3 }, { id: 3, c: 0, r: 4 }, { id: 4, c: 0, r: 5 },
@@ -78,20 +78,20 @@
         ];
 
         hexData.forEach(hex => {
-            // En pointy-topped, les columnes senars es desplacen cap avall mitja alçada de pas
-            const isOddColumn = (hex.c % 2 !== 0);
-            const verticalShift = isOddColumn ? (STEP_Y * 0.5) : 0;
+            // Les columnes parelles (0, 2, 4...) baixen mig pas vertical respecte a les senars
+            const isEvenColumn = (hex.c % 2 === 0);
+            const verticalShift = isEvenColumn ? (STEP_Y * 0.5) : 0;
 
             const cx = OFFSET_X + (hex.c * STEP_X);
             const cy = OFFSET_Y + (hex.r * STEP_Y) + verticalShift;
 
-            // Coordenades dels 6 vèrtexs per a un hexàgon amb PUNTA A DALT i A BAIX
-            const x1 = cx,                    y1 = cy - HEX_HEIGHT * 0.5; // Punta dalt
-            const x2 = cx + HEX_WIDTH * 0.5,  y2 = cy - HEX_HEIGHT * 0.25;
-            const x3 = cx + HEX_WIDTH * 0.5,  y3 = cy + HEX_HEIGHT * 0.25;
-            const x4 = cx,                    y4 = cy + HEX_HEIGHT * 0.5; // Punta baix
-            const x5 = cx - HEX_WIDTH * 0.5,  y5 = cy + HEX_HEIGHT * 0.25;
-            const x6 = cx - HEX_WIDTH * 0.5,  y6 = cy - HEX_HEIGHT * 0.25;
+            // Vèrtexs d'un hexàgon amb punta a dalt i a baix (pointy-topped)
+            const x1 = cx;                    y1 = cy - HEX_HEIGHT * 0.5; // Top tip
+            const x2 = cx + HEX_WIDTH * 0.5;  y2 = cy - HEX_HEIGHT * 0.25;
+            const x3 = cx + HEX_WIDTH * 0.5;  y3 = cy + HEX_HEIGHT * 0.25;
+            const x4 = cx;                    y4 = cy + HEX_HEIGHT * 0.5; // Bottom tip
+            const x5 = cx - HEX_WIDTH * 0.5;  y5 = cy + HEX_HEIGHT * 0.25;
+            const x6 = cx - HEX_WIDTH * 0.5;  y6 = cy - HEX_HEIGHT * 0.25;
 
             const pointsStr = `${x1},${y1} ${x2},${y2} ${x3},${y3} ${x4},${y4} ${x5},${y5} ${x6},${y6}`;
 
