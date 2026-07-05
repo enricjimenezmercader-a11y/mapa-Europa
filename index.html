@@ -3,85 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa d'Europa - Retícula Precisa</title>
+    <title>Mapa d'Europa - Solapament Perfecte</title>
     <style>
-        /* Fons blanc i centrat absolut del contingut */
         body {
-            background-color: #ffffff;
+            background-color: #f0f0f0;
             margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow: hidden;
         }
 
-        /* Contenidor adaptatiu que manté la proporció 16:9 de la imatge */
         .map-container {
-            position: relative;
             width: 100%;
-            max-width: 1200px; 
-            aspect-ratio: 16 / 9;
-            background-image: url('https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/ddd5150cf2ed279aaf0608cd4e9af7f266838c25/Mapa%20europa-Layout2.jpg');
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
+            max-width: 1400px; /* Pots fer-ho més gran o més petit, tot s'escalarà bé */
+            padding: 20px;
         }
 
-        /* Capa SVG transparent a sobre del mapa */
         svg {
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
-            height: 100%;
+            height: auto;
+            box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+            background-color: white;
         }
 
-        /* Estil per als hexàgons dibuixats */
+        /* Estil dels hexàgons */
         .hex-polygon {
-            fill: rgba(0, 0, 0, 0); /* Totalment transparent per deixar veure el mapa */
-            stroke: #000000;       /* Línia negra exactament com el teu disseny */
+            fill: rgba(0, 0, 0, 0); /* Totalment transparent */
+            stroke: #00ff00; /* Verd fluorescent temporalment perquè vegis bé el solapament. Canvia-ho a 'transparent' quan ho tinguis llest */
             stroke-width: 2;
             cursor: pointer;
             transition: fill 0.2s, stroke 0.2s;
         }
 
-        /* Efecte en passar el ratolí per sobre (opcional, dóna molta interactivitat) */
         .hex-polygon:hover {
-            fill: rgba(217, 0, 0, 0.15); 
-            stroke: #d90000;
-        }
-
-        /* Estil per als números vermells (ocults o visibles segons vulguis) */
-        .hex-text {
-            font-family: 'Arial', sans-serif;
-            font-size: 22px;
-            font-weight: bold;
-            fill: #d90000; /* Vermell intens idèntic al teu original */
-            text-anchor: middle;
-            dominant-baseline: central;
-            pointer-events: none; /* Evita que el text interfereixi amb el clic a l'hexàgon */
+            fill: rgba(0, 150, 255, 0.4); /* Blau semi-transparent en passar el ratolí */
+            stroke: #0096ff;
         }
     </style>
 </head>
 <body>
 
     <div class="map-container">
-        <svg viewBox="0 0 1600 900" id="hex-grid"></svg>
+        <svg viewBox="0 0 1600 900" id="hex-grid">
+            <image href="https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/ddd5150cf2ed279aaf0608cd4e9af7f266838c25/Mapa%20europa-Layout2.jpg" 
+                   x="0" y="0" width="1600" height="900" preserveAspectRatio="none" />
+            
+            </svg>
     </div>
 
     <script>
         const svg = document.getElementById('hex-grid');
 
-        // Mesures matemàtiques calculades exactament per calcar la teva graella (Flat-topped)
-        const HEX_HEIGHT = 120; 
-        const HEX_WIDTH = HEX_HEIGHT * (2 / Math.sqrt(3)); // ~138.56
-        const STEP_X = HEX_WIDTH * 0.75;                  // ~103.92
-        const STEP_Y = HEX_HEIGHT;                        // 120
-        const OFFSET_X = 349.5;                           // Encaix horitzontal del bloc
-        const OFFSET_Y = 60;                              // Encaix vertical del bloc
+        // --- VARIABLES D'AJUST FIN (TWEAKING) ---
+        // Modifica aquests números a poc a poc per fer coincidir la teva malla amb la imatge.
+        const HEX_WIDTH = 138.5;  // Amplada de l'hexàgon (esquerra a dreta)
+        const HEX_HEIGHT = 120;   // Alçada de l'hexàgon (dalt a baix)
+        const STEP_X = HEX_WIDTH * 0.75; // Distància horitzontal entre columnes
+        const STEP_Y = HEX_HEIGHT;       // Distància vertical entre files
+        const OFFSET_X = 350;     // Mou TOTA la graella cap a la dreta o esquerra
+        const OFFSET_Y = 60;      // Mou TOTA la graella amunt o avall
 
-        // Mapeig posicional manual un per un de la teva imatge de referència (Columnes 0-9, Files 0-6)
         const hexData = [
             { id: 1, c: 0, r: 2 }, { id: 2, c: 0, r: 3 }, { id: 3, c: 0, r: 4 }, { id: 4, c: 0, r: 5 },
             { id: 5, c: 1, r: 2 }, { id: 6, c: 1, r: 3 }, { id: 7, c: 1, r: 4 }, { id: 8, c: 1, r: 5 }, { id: 9, c: 1, r: 6 },
@@ -95,17 +77,13 @@
             { id: 54, c: 9, r: 0 }, { id: 55, c: 9, r: 1 }, { id: 56, c: 9, r: 2 }, { id: 57, c: 9, r: 3 }, { id: 58, c: 9, r: 4 }, { id: 59, c: 9, r: 5 }, { id: 60, c: 9, r: 6 }
         ];
 
-        // Renderitzar cada element de la llista
         hexData.forEach(hex => {
-            // El teu patró utilitza un escalat vertical en les columnes parelles de la matriu
             const isShifted = (hex.c % 2 === 0);
             const verticalShift = isShifted ? (STEP_Y * 0.5) : 0;
 
-            // Coordenades del centre geomètric de l'hexàgon actual
             const cx = OFFSET_X + (hex.c * STEP_X);
             const cy = OFFSET_Y + (hex.r * STEP_Y) + verticalShift;
 
-            // Calcular matemàticament els 6 punts del polígon (vèrtexs horitzontals de tall)
             const x1 = cx - HEX_WIDTH * 0.25, y1 = cy - HEX_HEIGHT * 0.5;
             const x2 = cx + HEX_WIDTH * 0.25, y2 = cy - HEX_HEIGHT * 0.5;
             const x3 = cx + HEX_WIDTH * 0.5,  y3 = cy;
@@ -115,21 +93,12 @@
 
             const pointsStr = `${x1},${y1} ${x2},${y2} ${x3},${y3} ${x4},${y4} ${x5},${y5} ${x6},${y6}`;
 
-            // 1. Dibuixar la cel·la (polígon)
             const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
             polygon.setAttribute("points", pointsStr);
             polygon.setAttribute("class", "hex-polygon");
             polygon.setAttribute("data-id", hex.id);
 
-            // 2. Afegir el text del número a sobre de cada cel·la
-            const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-            text.setAttribute("x", cx);
-            text.setAttribute("y", cy);
-            text.setAttribute("class", "hex-text");
-            text.textContent = hex.id;
-
             svg.appendChild(polygon);
-            svg.appendChild(text);
         });
     </script>
 
