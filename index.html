@@ -16,7 +16,7 @@
 
         .map-container {
             width: 100%;
-            max-width: 1400px; /* Pots fer-ho més gran o més petit, tot s'escalarà bé */
+            max-width: 1400px;
             padding: 20px;
         }
 
@@ -30,14 +30,15 @@
         /* Estil dels hexàgons */
         .hex-polygon {
             fill: rgba(0, 0, 0, 0); /* Totalment transparent */
-            stroke: #00ff00; /* Verd fluorescent temporalment perquè vegis bé el solapament. Canvia-ho a 'transparent' quan ho tinguis llest */
-            stroke-width: 2;
+            /* Magenta per veure l'encaix. Canvia-ho a 'transparent' o '#000000' quan vulguis */
+            stroke: #ff00ff; 
+            stroke-width: 2.5;
             cursor: pointer;
             transition: fill 0.2s, stroke 0.2s;
         }
 
         .hex-polygon:hover {
-            fill: rgba(0, 150, 255, 0.4); /* Blau semi-transparent en passar el ratolí */
+            fill: rgba(0, 150, 255, 0.4); 
             stroke: #0096ff;
         }
     </style>
@@ -48,22 +49,22 @@
         <svg viewBox="0 0 1600 900" id="hex-grid">
             <image href="https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/ddd5150cf2ed279aaf0608cd4e9af7f266838c25/Mapa%20europa-Layout2.jpg" 
                    x="0" y="0" width="1600" height="900" preserveAspectRatio="none" />
-            
-            </svg>
+        </svg>
     </div>
 
     <script>
         const svg = document.getElementById('hex-grid');
 
-        // --- VARIABLES D'AJUST FIN (TWEAKING) ---
-        // Modifica aquests números a poc a poc per fer coincidir la teva malla amb la imatge.
-        const HEX_WIDTH = 138.5;  // Amplada de l'hexàgon (esquerra a dreta)
-        const HEX_HEIGHT = 120;   // Alçada de l'hexàgon (dalt a baix)
-        const STEP_X = HEX_WIDTH * 0.75; // Distància horitzontal entre columnes
-        const STEP_Y = HEX_HEIGHT;       // Distància vertical entre files
-        const OFFSET_X = 350;     // Mou TOTA la graella cap a la dreta o esquerra
-        const OFFSET_Y = 60;      // Mou TOTA la graella amunt o avall
+        // --- NOVES VARIABLES RECALIBRADES ---
+        // S'han reduït les mides per evitar l'expansió cap a la dreta i cap avall
+        const HEX_HEIGHT = 110.5;  
+        const HEX_WIDTH = 127.6;   
+        const STEP_X = 95.7; 
+        const STEP_Y = 110.5;       
+        const OFFSET_X = 316;     
+        const OFFSET_Y = 96;      
 
+        // Matriu de coordenades (sense els números)
         const hexData = [
             { id: 1, c: 0, r: 2 }, { id: 2, c: 0, r: 3 }, { id: 3, c: 0, r: 4 }, { id: 4, c: 0, r: 5 },
             { id: 5, c: 1, r: 2 }, { id: 6, c: 1, r: 3 }, { id: 7, c: 1, r: 4 }, { id: 8, c: 1, r: 5 }, { id: 9, c: 1, r: 6 },
@@ -96,7 +97,9 @@
             const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
             polygon.setAttribute("points", pointsStr);
             polygon.setAttribute("class", "hex-polygon");
-            polygon.setAttribute("data-id", hex.id);
+            
+            // L'atribut ID et servirà en el futur per saber quin hexàgon s'ha clicat des de JavaScript
+            polygon.setAttribute("data-id", hex.id); 
 
             svg.appendChild(polygon);
         });
