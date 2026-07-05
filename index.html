@@ -15,16 +15,16 @@
     <script>
         const svg = document.getElementById('map');
         
-        // Paràmetres extrets directament de la imatge:
-        const W = 110;  // Amplada de l'hexàgon (de costat a costat)
-        const H = 127;  // Alçada de l'hexàgon (de punta a punta)
+        // Valors extrets directament del teu fitxer (Píxel a Píxel)
+        const H = 127; // Alçada visual punta a punta
+        const W = 110; // Amplada visual costat a costat
         const STEP_X = 110;
         const STEP_Y = 95;
         const START_X = 293;
         const START_Y = 260;
 
-        // Funció per generar hexàgon Pointy-Topped
-        function drawHex(id, c, r) {
+        // Funció per dibuixar hexàgon Pointy-Topped
+        function drawHex(c, r) {
             const x = START_X + (c * STEP_X);
             const y = START_Y + (r * STEP_Y) + (c % 2 === 0 ? 47.5 : 0);
             
@@ -40,14 +40,21 @@
             svg.appendChild(poly);
         }
 
-        // Llistat definitiu basat en la posició visual:
+        // Mapeig de la teva graella visual (c=columna, r=fila relativa)
         const grid = [
-            {id:1, c:0, r:0}, {id:2, c:0, r:1}, {id:3, c:0, r:2}, {id:4, c:0, r:3},
-            {id:5, c:1, r:-1}, {id:6, c:1, r:0}, {id:7, c:1, r:1}, {id:8, c:1, r:2}, {id:9, c:1, r:3},
-            // ... afegeix aquí la resta seguint aquest patró
+            {c:0, r:0}, {c:0, r:1}, {c:0, r:2}, {c:0, r:3},
+            {c:1, r:-1}, {c:1, r:0}, {c:1, r:1}, {c:1, r:2}, {c:1, r:3},
+            {c:2, r:-1}, {c:2, r:0}, {c:2, r:1}, {c:2, r:2},
+            {c:3, r:-2}, {c:3, r:-1}, {c:3, r:0}, {c:3, r:1}, {c:3, r:2}, {c:3, r:3},
+            {c:4, r:-3}, {c:4, r:-2}, {c:4, r:-1}, {c:4, r:0}, {c:4, r:1}, {c:4, r:2}, {c:4, r:3},
+            {c:5, r:-3}, {c:5, r:-2}, {c:5, r:-1}, {c:5, r:0}, {c:5, r:1}, {c:5, r:2}, {c:5, r:3},
+            {c:6, r:-3}, {c:6, r:-2}, {c:6, r:-1}, {c:6, r:0}, {c:6, r:1}, {c:6, r:2}, {c:6, r:3},
+            {c:7, r:-3}, {c:7, r:-2}, {c:7, r:-1}, {c:7, r:0}, {c:7, r:1}, {c:7, r:2}, {c:7, r:3},
+            {c:8, r:-3}, {c:8, r:-2}, {c:8, r:-1}, {c:8, r:0}, {c:8, r:1}, {c:8, r:2}, {c:8, r:3},
+            {c:9, r:-3}, {c:9, r:-2}, {c:9, r:-1}, {c:9, r:0}, {c:9, r:1}, {c:9, r:2}, {c:9, r:3}
         ];
 
-        grid.forEach(h => drawHex(h.id, h.c, h.r));
+        grid.forEach(h => drawHex(h.c, h.r));
     </script>
 </body>
 </html>
