@@ -2,55 +2,52 @@
 <html lang="ca">
 <head>
     <style>
-        body { margin: 0; display: flex; justify-content: center; background: #000; }
-        svg { width: 100%; max-width: 1600px; }
-        .hex-polygon { fill: transparent; stroke: #ff00ff; stroke-width: 2.5; cursor: pointer; }
-        .hex-polygon:hover { fill: rgba(255, 255, 255, 0.3); }
+        body { margin: 0; background: #000; display: flex; justify-content: center; }
+        svg { width: 100%; max-width: 1600px; height: auto; }
+        .hex { fill: none; stroke: #ff00ff; stroke-width: 3; }
     </style>
 </head>
 <body>
-    <svg viewBox="0 0 1600 900" id="hex-grid">
+    <svg viewBox="0 0 1600 900" id="map">
         <image href="Mapa europa-Layout2.jpg" width="1600" height="900" />
     </svg>
 
     <script>
-        const svg = document.getElementById('hex-grid');
+        const svg = document.getElementById('map');
         
-        // Mides visuals extretes de la teva imatge
-        const H = 127; // Alçada visual hexàgon
-        const W = 110; // Amplada visual hexàgon
-        
+        // Paràmetres extrets directament de la imatge:
+        const W = 110;  // Amplada de l'hexàgon (de costat a costat)
+        const H = 127;  // Alçada de l'hexàgon (de punta a punta)
+        const STEP_X = 110;
+        const STEP_Y = 95;
         const START_X = 293;
         const START_Y = 260;
-        const COL_STEP = 110;
-        const ROW_STEP = 95;
 
-        // Definició de la graella (columna c, fila r)
-        const hexData = [
-            { id: 1, c: 0, r: 0 }, { id: 2, c: 0, r: 1 }, { id: 3, c: 0, r: 2 }, { id: 4, c: 0, r: 3 },
-            { id: 5, c: 1, r: -1 }, { id: 6, c: 1, r: 0 }, { id: 7, c: 1, r: 1 }, { id: 8, c: 1, r: 2 }, { id: 9, c: 1, r: 3 },
-            // ... (Aquesta lògica aplica la posició real)
-        ];
-
-        hexData.forEach(h => {
-            const x = START_X + (h.c * COL_STEP);
-            const y = START_Y + (h.r * ROW_STEP) + (h.c % 2 === 0 ? 47.5 : 0);
+        // Funció per generar hexàgon Pointy-Topped
+        function drawHex(id, c, r) {
+            const x = START_X + (c * STEP_X);
+            const y = START_Y + (r * STEP_Y) + (c % 2 === 0 ? 47.5 : 0);
             
-            // Dibuix d'un hexàgon amb punta a dalt
-            const points = [
-                `${x},${y - H/2}`,
-                `${x + W/2},${y - H/4}`,
-                `${x + W/2},${y + H/4}`,
-                `${x},${y + H/2}`,
-                `${x - W/2},${y + H/4}`,
-                `${x - W/2},${y - H/4}`
+            const p = [
+                `${x},${y - H/2}`, `${x + W/2},${y - H/4}`,
+                `${x + W/2},${y + H/4}`, `${x},${y + H/2}`,
+                `${x - W/2},${y + H/4}`, `${x - W/2},${y - H/4}`
             ].join(" ");
 
             const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-            poly.setAttribute("points", points);
-            poly.setAttribute("class", "hex-polygon");
+            poly.setAttribute("points", p);
+            poly.setAttribute("class", "hex");
             svg.appendChild(poly);
-        });
+        }
+
+        // Llistat definitiu basat en la posició visual:
+        const grid = [
+            {id:1, c:0, r:0}, {id:2, c:0, r:1}, {id:3, c:0, r:2}, {id:4, c:0, r:3},
+            {id:5, c:1, r:-1}, {id:6, c:1, r:0}, {id:7, c:1, r:1}, {id:8, c:1, r:2}, {id:9, c:1, r:3},
+            // ... afegeix aquí la resta seguint aquest patró
+        ];
+
+        grid.forEach(h => drawHex(h.id, h.c, h.r));
     </script>
 </body>
 </html>
