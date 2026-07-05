@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Imatge Centrada - Layout 2</title>
+    <title>Graella Hexagonal Superposada al Mapa d'Europa Net</title>
     <style>
-        /* Configura el fons blanc i centra el contingut a la pantalla completa */
         body {
             background-color: #ffffff;
             margin: 0;
@@ -13,19 +12,107 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            overflow: hidden; /* Evita barres de desplaçament */
         }
 
-        /* Assegura que la imatge sigui responsiva i no desbordi la pantalla */
-        img {
-            max-width: 100%;
-            max-height: 100vh;
-            object-fit: contain;
+        #map-container {
+            position: relative;
+            width: 80%; /* Ajusta segons la mida de la pantalla */
+            max-width: 1200px;
+            aspect-ratio: 16/9; /* Coincideix amb l'aspecte de la imatge */
+            background-image: url('mapa_europa_net.jpg'); /* Enllaç a la teva nova imatge neta */
+            background-size: cover;
+            background-position: center;
+            border: 2px solid #ccc; /* Un bord subtil */
         }
+
+        #grid-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            /* Patró escalonat: 10 files, 6 columnes per a un total de 60 cel·les */
+            grid-template-columns: repeat(6, 1fr);
+            grid-auto-rows: calc(100% / 10);
+            pointer-events: none; /* Deixa passar els clics al mapa si és interactiu */
+        }
+
+        /* Estil per a la forma i el número dels hexàgons */
+        .hex-cell {
+            position: relative;
+            grid-column: span 1;
+            grid-row: span 1;
+            box-sizing: border-box;
+            border: 1px solid rgba(0, 0, 0, 0.4); /* Línies de la graella */
+            background-color: rgba(255, 255, 255, 0.1); /* Un fons molt subtil */
+            color: #d90000; /* Color dels números (vermell intens) */
+            font-family: Arial, sans-serif;
+            font-size: 1.5rem; /* Ajusta la mida del número */
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: auto; /* Permet interactuar amb cada cel·la */
+            transition: background-color 0.2s; /* Efecte de passar el ratolí */
+            /* Efecte d'hexàgon: */
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
+
+        .hex-cell:hover {
+            background-color: rgba(217, 0, 0, 0.2); /* Color de realç vermell */
+            cursor: pointer;
+        }
+
+        /* Posicionament escalonat amb JavaScript per evitar un HTML llarg */
     </style>
 </head>
 <body>
 
-    <img src="https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/ddd5150cf2ed279aaf0608cd4e9af7f266838c25/Mapa%20europa-Layout2.jpg" alt="Mapa d'Europa - Layout 2">
+    <div id="map-container">
+        <div id="grid-container">
+            </div>
+    </div>
+
+    <script>
+        const gridContainer = document.getElementById('grid-container');
+        const numHexagons = 60;
+
+        // Crear i numerar les cel·les
+        for (let i = 1; i <= numHexagons; i++) {
+            const cell = document.createElement('div');
+            cell.classList.add('hex-cell');
+            cell.innerText = i;
+            // Opcional: Afegir un ID o data-attribute per a interactivitat
+            cell.dataset.id = i;
+            gridContainer.appendChild(cell);
+        }
+
+        // Posicionament escalonat dels hexàgons
+        function positionHexagons() {
+            const cells = document.querySelectorAll('.hex-cell');
+            const cols = 6;
+            const rows = 10;
+            
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const index = r * cols + c;
+                    if (index < cells.length) {
+                        cells[index].style.gridColumnStart = c + 1;
+                        cells[index].style.gridRowStart = r + 1;
+                        // El desplaçament escalonat per a files senars
+                        if (r % 2 === 1) {
+                            cells[index].style.transform = 'translateX(50%)';
+                        }
+                    }
+                }
+            }
+        }
+
+        // Executar un cop el document estigui carregat
+        window.addEventListener('DOMContentLoaded', positionHexagons);
+    </script>
 
 </body>
 </html>
