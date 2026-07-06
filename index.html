@@ -18,7 +18,7 @@
         .hex { 
             fill: none; 
             stroke: #ff00ff; 
-            stroke-width: 10; /* Reduït de 50000 a 15000 per afinar el traç */
+            stroke-width: 10; /* Ajustat a la teva petició */
             vector-effect: non-scaling-stroke;
         }
     </style>
@@ -36,13 +36,18 @@
     <script>
         const svg = document.getElementById('map');
         
-        // Constants
-        const s = 1595081; 
-        const H = 2762761; 
-        const START_CAD_X = 2898289.5; 
-        const START_CAD_Y = 2418393.5;
-        const STEP_X = 1595081; 
-        const STEP_Y = 2762761; 
+        // --- PARÀMETRES D'AJUST ---
+        // Si el dibuix està desplaçat, canvia aquests valors (Offset)
+        const OFFSET_X = 2898289.5; 
+        const OFFSET_Y = 2418393.5;
+        
+        // Si el dibuix està més gran o més petit, canvia aquests valors (Scale)
+        const SCALE_X = 1595081; 
+        const SCALE_Y = 2762761; 
+        
+        // Dimensions del hexàgon
+        const s = SCALE_X; 
+        const H = SCALE_Y; 
 
         const grid = [
             {c:0, r:0}, {c:0, r:1}, {c:0, r:2}, {c:0, r:3},
@@ -58,9 +63,10 @@
         ];
 
         grid.forEach(h => {
-            const cx = START_CAD_X + (h.c * STEP_X);
-            const cy = START_CAD_Y + (h.r * STEP_Y) + (h.c % 2 !== 0 ? STEP_Y / 2 : 0);
+            const cx = OFFSET_X + (h.c * SCALE_X);
+            const cy = OFFSET_Y + (h.r * SCALE_Y) + (h.c % 2 !== 0 ? SCALE_Y / 2 : 0);
             
+            // Definim els punts basats en els increments de escala
             const points = [
                 {x: cx - s/2, y: cy - H/2},
                 {x: cx + s/2, y: cy - H/2},
