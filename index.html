@@ -5,50 +5,50 @@
     <title>Mapa Europa - Graella Perfecta</title>
     <style>
         body { 
-            margin: 0; 
-            background: #222; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
+            margin: 0; background: #222; 
+            display: flex; justify-content: center; align-items: center; 
             min-height: 100vh; 
         }
         #container { 
-            position: relative; 
-            width: 95vw; 
-            max-width: 1400px; 
-            aspect-ratio: 16 / 9; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+            width: 90vw; max-width: 1200px; 
+            /* Mantenim el ratio de la imatge original */
+            aspect-ratio: 26757154 / 22877366; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
-        svg { 
-            width: 100%; 
-            height: 100%; 
-            display: block; 
-        }
+        svg { width: 100%; height: 100%; display: block; }
         .hex { 
-            fill: none; 
-            stroke: #ff00ff; 
-            stroke-width: 3; 
-            vector-effect: non-scaling-stroke; 
+            fill: none; stroke: #ff00ff; stroke-width: 50000; 
+            vector-effect: non-scaling-stroke;
         }
     </style>
 </head>
 <body>
     <div id="container">
-        <svg id="map" preserveAspectRatio="none" viewBox="0 0 1000 562.5"></svg>
+        <svg id="map" viewBox="0 0 26757154 22877366">
+            <image 
+                href="https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/6898921c906330dcfbaaa4b3be8e8745a0800762/Mapa%20europa-Layout2.jpg"
+                width="26757154" height="22877366" 
+            />
+        </svg>
     </div>
 
     <script>
         const svg = document.getElementById('map');
         
-        // Constants de disseny
-        const s = 1595080.5; 
+        // Constants derivades dels vèrtexs del Hexàgon 4
+        // Amplada total del hexàgon = 3695830 - 2100749 = 1595081
+        // Alçada total del hexàgon = 3799774 - 1037013 = 2762761
+        const s = 1595081; 
         const H = 2762761; 
-        const STEP_X = 1.5 * s;
-        const STEP_Y = H;        
+        
+        // Centres calculats a partir dels punts del Hexàgon 4
         const START_CAD_X = 2898289.5; 
-        const START_CAD_Y = 2418393;
+        const START_CAD_Y = 2418393.5;
+        
+        // Pas entre centres (ajustat per la teva graella)
+        const STEP_X = 1595081; // Distància horitzontal
+        const STEP_Y = 2762761; // Distància vertical
 
-        // Definició de la graella
         const grid = [
             {c:0, r:0}, {c:0, r:1}, {c:0, r:2}, {c:0, r:3},
             {c:1, r:0}, {c:1, r:1}, {c:1, r:2}, {c:1, r:3}, {c:1, r:4},
@@ -62,63 +62,22 @@
             {c:9, r:-4}, {c:9, r:-3}, {c:9, r:-2}, {c:9, r:-1}, {c:9, r:0}, {c:9, r:1}, {c:9, r:2}
         ];
 
-        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-        const polygonsToDraw = [];
-
-        // 1. Càlcul de punts
         grid.forEach(h => {
-            const cad_x = START_CAD_X + (h.c * STEP_X);
-            const cad_y = START_CAD_Y + (h.r * STEP_Y) + (h.c % 2 !== 0 ? STEP_Y / 2 : 0);
+            // Càlcul de posició basada en els increments definits
+            const cx = START_CAD_X + (h.c * STEP_X);
+            const cy = START_CAD_Y + (h.r * STEP_Y) + (h.c % 2 !== 0 ? STEP_Y / 2 : 0);
             
-            // Definim vèrtexs
             const points = [
-                {x: cad_x - s/2, y: cad_y - H/2},
-                {x: cad_x + s/2, y: cad_y - H/2},
-                {x: cad_x + s,   y: cad_y},      
-                {x: cad_x + s/2, y: cad_y + H/2},
-                {x: cad_x - s/2, y: cad_y + H/2},
-                {x: cad_x - s,   y: cad_y}       
+                {x: cx - s/2, y: cy - H/2}, // Top Left
+                {x: cx + s/2, y: cy - H/2}, // Top Right
+                {x: cx + s,   y: cy},       // Right
+                {x: cx + s/2, y: cy + H/2}, // Bot Right
+                {x: cx - s/2, y: cy + H/2}, // Bot Left
+                {x: cx - s,   y: cy}        // Left
             ];
 
-            const svg_points = points.map(pt => {
-                // Invertim Y per passar de CAD a SVG
-                const sx = pt.x;
-                const sy = -pt.y; 
-                
-                minX = Math.min(minX, sx);
-                maxX = Math.max(maxX, sx);
-                minY = Math.min(minY, sy);
-                maxY = Math.max(maxY, sy);
-                
-                return `${sx},${sy}`;
-            }).join(" ");
-            
-            polygonsToDraw.push(svg_points);
-        });
-
-        // 2. Ajust dinàmic de l'enquadrament
-        const padding = 500000; // Ajust de marge en unitats de mapa
-        const vbX = minX - padding;
-        const vbY = minY - padding;
-        const vbW = (maxX - minX) + (padding * 2);
-        const vbH = (maxY - minY) + (padding * 2);
-
-        svg.setAttribute("viewBox", `${vbX} ${vbY} ${vbW} ${vbH}`);
-
-        // 3. Imatge (S'afegeix primer per quedar al fons)
-        const img = document.createElementNS("http://www.w3.org/2000/svg", "image");
-        img.setAttribute("href", "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/6898921c906330dcfbaaa4b3be8e8745a0800762/Mapa%20europa-Layout2.jpg");
-        img.setAttribute("x", vbX);
-        img.setAttribute("y", vbY);
-        img.setAttribute("width", vbW);
-        img.setAttribute("height", vbH);
-        img.setAttribute("preserveAspectRatio", "none");
-        svg.appendChild(img);
-
-        // 4. Dibuix dels hexàgons
-        polygonsToDraw.forEach(pts => {
             const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-            poly.setAttribute("points", pts);
+            poly.setAttribute("points", points.map(p => `${p.x},${p.y}`).join(" "));
             poly.setAttribute("class", "hex");
             svg.appendChild(poly);
         });
