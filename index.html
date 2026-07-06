@@ -2,20 +2,20 @@
 <html lang="ca">
 <head>
     <meta charset="UTF-8">
-    <title>Mapa Europa - Graella CAD</title>
+    <title>Mapa Europa - Graella CAD Perfecta</title>
     <style>
-        body { margin: 0; background: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        /* Sense marcs per evitar confusions */
-        #container { position: relative; width: 90vw; }
-        svg { width: 100%; height: auto; display: block; }
+        body { margin: 0; background: #222; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        /* He afegit una mica d'estil fosc de fons per veure bé on acaba el mapa */
+        #container { position: relative; width: 95vw; max-width: 1400px; }
+        svg { width: 100%; height: auto; display: block; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         .hex { fill: none; stroke: #ff00ff; stroke-width: 3; vector-effect: non-scaling-stroke; }
     </style>
 </head>
 <body>
     <div id="container">
-        <svg viewBox="0 0 26757154 22877366" id="map">
+        <svg viewBox="0 0 40670873 22877366" id="map">
             <image href="https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/6898921c906330dcfbaaa4b3be8e8745a0800762/Mapa%20europa-Layout2.jpg" 
-                   width="26757154" height="22877366" preserveAspectRatio="none" />
+                   width="40670873" height="22877366" />
         </svg>
     </div>
 
@@ -23,7 +23,7 @@
         const svg = document.getElementById('map');
         const SVG_HEIGHT = 22877366;
         
-        // Càlculs REALS basats en els vèrtexs
+        // Càlculs dels vèrtexs
         const s = 1595080.5; 
         const H = 2762761; 
         const STEP_X = 1.5 * s;
@@ -46,6 +46,7 @@
                 {x: cad_x - s,   y: cad_y}       
             ];
 
+            // Inversió de l'eix Y per adaptar CAD a SVG
             const svg_points = cad_points.map(pt => `${pt.x},${SVG_HEIGHT - pt.y}`).join(" ");
 
             const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
