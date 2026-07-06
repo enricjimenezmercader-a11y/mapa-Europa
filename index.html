@@ -2,60 +2,53 @@
 <html lang="ca">
 <head>
     <meta charset="UTF-8">
-    <title>Mapa Europa - Graella CAD Perfecta</title>
+    <title>Mapa Europa - Graella Perfecta</title>
     <style>
-        body { margin: 0; background: #222; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        /* He afegit una mica d'estil fosc de fons per veure bé on acaba el mapa */
-        #container { position: relative; width: 95vw; max-width: 1400px; }
-        svg { width: 100%; height: auto; display: block; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .hex { fill: none; stroke: #ff00ff; stroke-width: 3; vector-effect: non-scaling-stroke; }
+        body { 
+            margin: 0; 
+            background: #222; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+        }
+        #container { 
+            position: relative; 
+            width: 95vw; 
+            max-width: 1400px; 
+            /* Aquesta línia és màgica: evita que la imatge base es deformi */
+            aspect-ratio: 16 / 9; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+        }
+        svg { 
+            width: 100%; 
+            height: 100%; 
+            display: block; 
+        }
+        .hex { 
+            fill: none; 
+            stroke: #ff00ff; 
+            stroke-width: 3; 
+            vector-effect: non-scaling-stroke; 
+        }
     </style>
 </head>
 <body>
     <div id="container">
-        <svg viewBox="0 0 40670873 22877366" id="map">
-            <image href="https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/6898921c906330dcfbaaa4b3be8e8745a0800762/Mapa%20europa-Layout2.jpg" 
-                   width="40670873" height="22877366" />
-        </svg>
+        <svg id="map" preserveAspectRatio="none"></svg>
     </div>
 
     <script>
         const svg = document.getElementById('map');
-        const SVG_HEIGHT = 22877366;
         
-        // Càlculs dels vèrtexs
+        // Coordenades CAD originals
         const s = 1595080.5; 
         const H = 2762761; 
         const STEP_X = 1.5 * s;
         const STEP_Y = H;       
-        
-        // Origen CAD basat en el centre de l'hexàgon 4
         const START_CAD_X = 2898289.5; 
         const START_CAD_Y = 2418393;
 
-        function drawHex(c, r) {
-            const cad_x = START_CAD_X + (c * STEP_X);
-            const cad_y = START_CAD_Y + (r * STEP_Y) + (c % 2 !== 0 ? STEP_Y / 2 : 0);
-            
-            const cad_points = [
-                {x: cad_x - s/2, y: cad_y - H/2},
-                {x: cad_x + s/2, y: cad_y - H/2},
-                {x: cad_x + s,   y: cad_y},      
-                {x: cad_x + s/2, y: cad_y + H/2},
-                {x: cad_x - s/2, y: cad_y + H/2},
-                {x: cad_x - s,   y: cad_y}       
-            ];
-
-            // Inversió de l'eix Y per adaptar CAD a SVG
-            const svg_points = cad_points.map(pt => `${pt.x},${SVG_HEIGHT - pt.y}`).join(" ");
-
-            const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-            poly.setAttribute("points", svg_points);
-            poly.setAttribute("class", "hex");
-            svg.appendChild(poly);
-        }
-
-        // Matriu de distribució dels 60 hexàgons
         const grid = [
             {c:0, r:0}, {c:0, r:1}, {c:0, r:2}, {c:0, r:3},
             {c:1, r:0}, {c:1, r:1}, {c:1, r:2}, {c:1, r:3}, {c:1, r:4},
@@ -69,7 +62,67 @@
             {c:9, r:-4}, {c:9, r:-3}, {c:9, r:-2}, {c:9, r:-1}, {c:9, r:0}, {c:9, r:1}, {c:9, r:2}
         ];
 
-        grid.forEach(h => drawHex(h.c, h.r));
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        const polygonsToDraw = [];
+
+        // 1. Generem els punts i calculem l'espai físic exacte de la retícula
+        grid.forEach(h => {
+            const cad_x = START_CAD_X + (h.c * STEP_X);
+            const cad_y = START_CAD_Y + (h.r * STEP_Y) + (h.c % 2 !== 0 ? STEP_Y / 2 : 0);
+            
+            const points = [
+                {x: cad_x - s/2, y: cad_y - H/2},
+                {x: cad_x + s/2, y: cad_y - H/2},
+                {x: cad_x + s,   y: cad_y},      
+                {x: cad_x + s/2, y: cad_y + H/2},
+                {x: cad_x - s/2, y: cad_y + H/2},
+                {x: cad_x - s,   y: cad_y}       
+            ];
+
+            const svg_points = points.map(pt => {
+                const sx = pt.x;
+                const sy = -pt.y; // Invertim Y exclusivament per adaptar CAD a SVG natural
+                
+                if (sx < minX) minX = sx;
+                if (sx > maxX) maxX = sx;
+                if (sy < minY) minY = sy;
+                if (sy > maxY) maxY = sy;
+                
+                return `${sx},${sy}`;
+            }).join(" ");
+            
+            polygonsToDraw.push(svg_points);
+        });
+
+        // 2. Calculem els marges fins a la línia negra de la imatge base
+        // Aquests percentatges s'han extret visualment perquè la retícula clavi amb els límits de la teva imatge
+        const gridWidth = maxX - minX;
+        const gridHeight = maxY - minY;
+        const vbX = minX - (gridWidth * 0.04); 
+        const vbY = minY - (gridHeight * 0.015);
+        const vbW = gridWidth + (gridWidth * 0.075);
+        const vbH = gridHeight + (gridHeight * 0.035);
+
+        // Apliquem l'enquadrament exacte
+        svg.setAttribute("viewBox", `${vbX} ${vbY} ${vbW} ${vbH}`);
+
+        // 3. Afegim la imatge vinculada exactament a aquest espai
+        const img = document.createElementNS("http://www.w3.org/2000/svg", "image");
+        img.setAttribute("href", "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/6898921c906330dcfbaaa4b3be8e8745a0800762/Mapa%20europa-Layout2.jpg");
+        img.setAttribute("x", vbX);
+        img.setAttribute("y", vbY);
+        img.setAttribute("width", vbW);
+        img.setAttribute("height", vbH);
+        img.setAttribute("preserveAspectRatio", "none");
+        svg.appendChild(img);
+
+        // 4. Dibuixem els hexàgons sobre la imatge
+        polygonsToDraw.forEach(pts => {
+            const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+            poly.setAttribute("points", pts);
+            poly.setAttribute("class", "hex");
+            svg.appendChild(poly);
+        });
     </script>
 </body>
 </html>
