@@ -16,7 +16,6 @@
             position: relative; 
             width: 95vw; 
             max-width: 1400px; 
-            /* Aquesta línia és màgica: evita que la imatge base es deformi */
             aspect-ratio: 16 / 9; 
             box-shadow: 0 5px 15px rgba(0,0,0,0.8);
         }
@@ -35,20 +34,21 @@
 </head>
 <body>
     <div id="container">
-        <svg id="map" preserveAspectRatio="none"></svg>
+        <svg id="map" preserveAspectRatio="none" viewBox="0 0 1000 562.5"></svg>
     </div>
 
     <script>
         const svg = document.getElementById('map');
         
-        // Coordenades CAD originals
+        // Constants de disseny
         const s = 1595080.5; 
         const H = 2762761; 
         const STEP_X = 1.5 * s;
-        const STEP_Y = H;       
+        const STEP_Y = H;        
         const START_CAD_X = 2898289.5; 
         const START_CAD_Y = 2418393;
 
+        // Definició de la graella
         const grid = [
             {c:0, r:0}, {c:0, r:1}, {c:0, r:2}, {c:0, r:3},
             {c:1, r:0}, {c:1, r:1}, {c:1, r:2}, {c:1, r:3}, {c:1, r:4},
@@ -65,11 +65,12 @@
         let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
         const polygonsToDraw = [];
 
-        // 1. Generem els punts i calculem l'espai físic exacte de la retícula
+        // 1. Càlcul de punts
         grid.forEach(h => {
             const cad_x = START_CAD_X + (h.c * STEP_X);
             const cad_y = START_CAD_Y + (h.r * STEP_Y) + (h.c % 2 !== 0 ? STEP_Y / 2 : 0);
             
+            // Definim vèrtexs
             const points = [
                 {x: cad_x - s/2, y: cad_y - H/2},
                 {x: cad_x + s/2, y: cad_y - H/2},
@@ -80,13 +81,14 @@
             ];
 
             const svg_points = points.map(pt => {
+                // Invertim Y per passar de CAD a SVG
                 const sx = pt.x;
-                const sy = -pt.y; // Invertim Y exclusivament per adaptar CAD a SVG natural
+                const sy = -pt.y; 
                 
-                if (sx < minX) minX = sx;
-                if (sx > maxX) maxX = sx;
-                if (sy < minY) minY = sy;
-                if (sy > maxY) maxY = sy;
+                minX = Math.min(minX, sx);
+                maxX = Math.max(maxX, sx);
+                minY = Math.min(minY, sy);
+                maxY = Math.max(maxY, sy);
                 
                 return `${sx},${sy}`;
             }).join(" ");
@@ -94,19 +96,16 @@
             polygonsToDraw.push(svg_points);
         });
 
-        // 2. Calculem els marges fins a la línia negra de la imatge base
-        // Aquests percentatges s'han extret visualment perquè la retícula clavi amb els límits de la teva imatge
-        const gridWidth = maxX - minX;
-        const gridHeight = maxY - minY;
-        const vbX = minX - (gridWidth * 0.04); 
-        const vbY = minY - (gridHeight * 0.015);
-        const vbW = gridWidth + (gridWidth * 0.075);
-        const vbH = gridHeight + (gridHeight * 0.035);
+        // 2. Ajust dinàmic de l'enquadrament
+        const padding = 500000; // Ajust de marge en unitats de mapa
+        const vbX = minX - padding;
+        const vbY = minY - padding;
+        const vbW = (maxX - minX) + (padding * 2);
+        const vbH = (maxY - minY) + (padding * 2);
 
-        // Apliquem l'enquadrament exacte
         svg.setAttribute("viewBox", `${vbX} ${vbY} ${vbW} ${vbH}`);
 
-        // 3. Afegim la imatge vinculada exactament a aquest espai
+        // 3. Imatge (S'afegeix primer per quedar al fons)
         const img = document.createElementNS("http://www.w3.org/2000/svg", "image");
         img.setAttribute("href", "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/6898921c906330dcfbaaa4b3be8e8745a0800762/Mapa%20europa-Layout2.jpg");
         img.setAttribute("x", vbX);
@@ -116,7 +115,7 @@
         img.setAttribute("preserveAspectRatio", "none");
         svg.appendChild(img);
 
-        // 4. Dibuixem els hexàgons sobre la imatge
+        // 4. Dibuix dels hexàgons
         polygonsToDraw.forEach(pts => {
             const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
             poly.setAttribute("points", pts);
