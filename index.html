@@ -1,75 +1,63 @@
 <!DOCTYPE html>
 <html lang="ca">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>MAPA ESTRATÈGIC — Radar i Anàlisi</title>
+    <meta charset="UTF-8">
+    <title>Mapa Europa - Flat-Topped (CAD Precision)</title>
     <style>
-        /* Mantenim el teu estil original */
-        *{box-sizing:border-box;margin:0;padding:0}
-        html,body{height:100%; background:#05050a; color:#fff; font-family:Arial,Helvetica,sans-serif; display:flex; flex-direction:column; align-items:center; padding-top:20px; gap:15px;}
-        .map-container{ position:relative; background:#111; border:2px solid #333; box-shadow: 0 0 20px rgba(0,0,0,0.8); overflow:hidden; }
-        .map-image{ position:absolute; inset:0; width:100%; height:100%; object-fit:contain; z-index:1; pointer-events:none; }
-        svg{ position:absolute; inset:0; width:100%; height:100%; z-index:10; pointer-events:none; }
-        .hex{ stroke:#000; stroke-width:2; }
-        .hex-red{ fill:rgba(255,0,0,0.3); }
-        .hex-blue{ fill:rgba(0,120,255,0.3); }
-        .hex-mar{ fill:rgba(120,120,120,0.25); }
-        .hex-label{ fill:#fff; font-weight:bold; text-anchor:middle; stroke:#000; stroke-width:0.8; font-size:12px; }
+        body { margin: 0; background: #000; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        #container { position: relative; width: 90vw; height: auto; }
+        /* El viewBox s'encarrega de l'escala, el CSS només dimensiona el contenidor */
+        svg { width: 100%; height: auto; display: block; }
+        .hex { fill: none; stroke: #ff00ff; stroke-width: 20000; /* Gruix ajustat a l'escala real */ }
     </style>
 </head>
 <body>
+    <div id="container">
+        <svg viewBox="0 0 26757154 22877366" id="map">
+            <image href="Mapa europa-Layout2.jpg" width="26757154" height="22877366" />
+        </svg>
+    </div>
 
-<div id="titleBar">MAPA ESTRATÈGIC</div>
-<div id="mapContainer" class="map-container">
-    <img class="map-image" src="https://github.com/enricjimenezmercader-a11y/mapa_estrategic/blob/481d1cc0765b31581a6f050a7f68d53400172e48/map_hex.jpg?raw=true" alt="Mapa">
-    <svg id="hexGrid"></svg>
-</div>
-
-<script>
-    // Configuració basada en els 155px (CAD)
-    const s = 155; 
-    const H = Math.sqrt(3) * s; 
-    const STEP_X = 1.5 * s;     // 232.5
-    const STEP_Y = Math.sqrt(3) * s; // 268.46
-    const START_X = 265; 
-    const START_Y = 277;
-
-    function initHexGridStructure(){
-        const svg = document.getElementById("hexGrid");
-        svg.innerHTML = "";
+    <script>
+        const svg = document.getElementById('map');
         
-        // Definim la graella segons el patró que tenies originalment
-        const grid = [
-            {c:0, r:0}, {c:0, r:1}, {c:0, r:2},
-            {c:1, r:-1}, {c:1, r:0}, {c:1, r:1}, {c:1, r:2},
-            // ... afegeix aquí la resta de columnes/files del teu array PATTERN
-        ];
+        // Constants derivades de les teves coordenades (s = 797540.5)
+        const s = 797540.5; 
+        const H = 1381380; 
+        const STEP_X = 1.5 * s;
+        const STEP_Y = H;
+        
+        // Punts d'inici calculats per al centre de l'hexàgon 4
+        const START_X = 2898289; 
+        const START_Y = 2418393;
 
-        grid.forEach((h, index) => {
-            const x = START_X + (h.c * STEP_X);
-            const y = START_Y + (h.r * STEP_Y) + (h.c % 2 !== 0 ? STEP_Y / 2 : 0);
+        function drawHex(c, r) {
+            const x = START_X + (c * STEP_X);
+            const y = START_Y + (r * STEP_Y) + (c % 2 !== 0 ? STEP_Y / 2 : 0);
             
-            // Generació vèrtexs FLAT-TOPPED (Vora plana a dalt)
-            const pts = [
+            const points = [
                 `${x - s/2},${y - H/2}`, `${x + s/2},${y - H/2}`,
                 `${x + s},${y}`, `${x + s/2},${y + H/2}`,
                 `${x - s/2},${y + H/2}`, `${x - s},${y}`
             ].join(" ");
 
-            const g = document.createElementNS("http://www.w3.org/2000/svg","g");
-            const poly = document.createElementNS("http://www.w3.org/2000/svg","polygon");
-            poly.setAttribute("points", pts);
-            poly.setAttribute("class", "hex hex-mar");
-            poly.dataset.id = index + 1;
-            
-            g.appendChild(poly);
-            svg.appendChild(g);
-        });
-    }
+            const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+            poly.setAttribute("points", points);
+            poly.setAttribute("class", "hex");
+            svg.appendChild(poly);
+        }
 
-    // Inicialització
-    initHexGridStructure();
-</script>
+        // Matriu de coordenades segons la teva imatge
+        const grid = [
+            {c:0, r:0}, {c:0, r:1}, {c:0, r:2},
+            {c:1, r:-1}, {c:1, r:0}, {c:1, r:1}, {c:1, r:2},
+            {c:2, r:-1}, {c:2, r:0}, {c:2, r:1}, {c:2, r:2},
+            {c:3, r:-2}, {c:3, r:-1}, {c:3, r:0}, {c:3, r:1}, {c:3, r:2},
+            {c:4, r:-2}, {c:4, r:-1}, {c:4, r:0}, {c:4, r:1}, {c:4, r:2},
+            {c:5, r:-2}, {c:5, r:-1}, {c:5, r:0}, {c:5, r:1}, {c:5, r:2}
+        ];
+
+        grid.forEach(h => drawHex(h.c, h.r));
+    </script>
 </body>
 </html>
