@@ -2,12 +2,12 @@
 <html lang="ca">
 <head>
     <meta charset="UTF-8">
-    <title>Mapa Europa - Graella CAD</title>
+    <title>Mapa Europa - Graella CAD Corregida</title>
     <style>
         body { margin: 0; background: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         #container { position: relative; width: 90vw; border: 1px solid #ccc; }
         svg { width: 100%; height: auto; display: block; }
-        /* CORRECCIÓ: Gruix de 3 píxels de pantalla gràcies al non-scaling-stroke */
+        /* Gruix de pantalla constant per a l'escala massiva */
         .hex { fill: none; stroke: #ff00ff; stroke-width: 3; vector-effect: non-scaling-stroke; }
     </style>
 </head>
@@ -21,41 +21,70 @@
 
     <script>
         const svg = document.getElementById('map');
+        const SVG_HEIGHT = 22877366;
         
-        // Paràmetres basats en les dades de l'hexàgon 4
-        const s = 797540.5; 
-        const H = 1381380; 
-        const STEP_X = 1.5 * s;
-        const STEP_Y = H;
+        // Càlculs REALS basats en els teus vèrtexs
+        const s = 1595080.5; 
+        const H = 2762761; 
+        const STEP_X = 1.5 * s; // 2392620.75
+        const STEP_Y = H;       // 2762761
         
-        // Origen basat en la posició de l'hexàgon 4
-        const START_X = 2898289; 
-        const START_Y = 2418393;
+        // Origen CAD basat en el centre geomètric de l'hexàgon 4
+        // (x_esquerra + x_dreta)/2  i  (y_baix + y_dalt)/2
+        const START_CAD_X = 2898289.5; 
+        const START_CAD_Y = 2418393;
 
         function drawHex(c, r) {
-            const x = START_X + (c * STEP_X);
-            const y = START_Y + (r * STEP_Y) + (c % 2 !== 0 ? STEP_Y / 2 : 0);
+            // Posicionament al sistema CAD original (Y creix cap amunt)
+            const cad_x = START_CAD_X + (c * STEP_X);
+            const cad_y = START_CAD_Y + (r * STEP_Y) + (c % 2 !== 0 ? STEP_Y / 2 : 0);
             
-            const points = [
-                `${x - s/2},${y - H/2}`, `${x + s/2},${y - H/2}`,
-                `${x + s},${y}`, `${x + s/2},${y + H/2}`,
-                `${x - s/2},${y + H/2}`, `${x - s},${y}`
-            ].join(" ");
+            // Definim els 6 vèrtexs en lògica CAD
+            const cad_points = [
+                {x: cad_x - s/2, y: cad_y - H/2}, // Baix Esquerra
+                {x: cad_x + s/2, y: cad_y - H/2}, // Baix Dreta
+                {x: cad_x + s,   y: cad_y},       // Dreta (Flat-top)
+                {x: cad_x + s/2, y: cad_y + H/2}, // Dalt Dreta
+                {x: cad_x - s/2, y: cad_y + H/2}, // Dalt Esquerra
+                {x: cad_x - s,   y: cad_y}        // Esquerra (Flat-top)
+            ];
+
+            // Convertim l'eix Y a format navegador web abans d'imprimir
+            const svg_points = cad_points.map(pt => `${pt.x},${SVG_HEIGHT - pt.y}`).join(" ");
 
             const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-            poly.setAttribute("points", points);
+            poly.setAttribute("points", svg_points);
             poly.setAttribute("class", "hex");
+            
+            // Opcional: Afegeix un identificador visual al codi font (c, r) per a debug
+            poly.setAttribute("data-col", c);
+            poly.setAttribute("data-row", r);
+            
             svg.appendChild(poly);
         }
 
-        // Matriu de columnes (c) i files (r)
+        // Matriu completa dels 60 hexàgons inferida per la imatge i les matemàtiques
         const grid = [
-            {c:0, r:0}, {c:0, r:1}, {c:0, r:2},
-            {c:1, r:-1}, {c:1, r:0}, {c:1, r:1}, {c:1, r:2},
-            {c:2, r:-1}, {c:2, r:0}, {c:2, r:1}, {c:2, r:2},
-            {c:3, r:-2}, {c:3, r:-1}, {c:3, r:0}, {c:3, r:1}, {c:3, r:2},
-            {c:4, r:-2}, {c:4, r:-1}, {c:4, r:0}, {c:4, r:1}, {c:4, r:2},
-            {c:5, r:-2}, {c:5, r:-1}, {c:5, r:0}, {c:5, r:1}, {c:5, r:2}
+            // Col 0 (Hex: 4 a sota, 3, 2, 1 a dalt)
+            {c:0, r:0}, {c:0, r:1}, {c:0, r:2}, {c:0, r:3},
+            // Col 1 (Hex: 9 a sota ... 5 a dalt)
+            {c:1, r:0}, {c:1, r:1}, {c:1, r:2}, {c:1, r:3}, {c:1, r:4},
+            // Col 2 (Hex: 12 ... 10)
+            {c:2, r:0}, {c:2, r:1}, {c:2, r:2},
+            // Col 3 (Hex: 18 ... 13)
+            {c:3, r:-1}, {c:3, r:0}, {c:3, r:1}, {c:3, r:2}, {c:3, r:3}, {c:3, r:4},
+            // Col 4 (Hex: 25 ... 19)
+            {c:4, r:-2}, {c:4, r:-1}, {c:4, r:0}, {c:4, r:1}, {c:4, r:2}, {c:4, r:3}, {c:4, r:4},
+            // Col 5 (Hex: 32 ... 26)
+            {c:5, r:-2}, {c:5, r:-1}, {c:5, r:0}, {c:5, r:1}, {c:5, r:2}, {c:5, r:3}, {c:5, r:4},
+            // Col 6 (Hex: 39 ... 33)
+            {c:6, r:-3}, {c:6, r:-2}, {c:6, r:-1}, {c:6, r:0}, {c:6, r:1}, {c:6, r:2}, {c:6, r:3},
+            // Col 7 (Hex: 46 ... 40)
+            {c:7, r:-3}, {c:7, r:-2}, {c:7, r:-1}, {c:7, r:0}, {c:7, r:1}, {c:7, r:2}, {c:7, r:3},
+            // Col 8 (Hex: 53 ... 47)
+            {c:8, r:-4}, {c:8, r:-3}, {c:8, r:-2}, {c:8, r:-1}, {c:8, r:0}, {c:8, r:1}, {c:8, r:2},
+            // Col 9 (Hex: 60 ... 54)
+            {c:9, r:-4}, {c:9, r:-3}, {c:9, r:-2}, {c:9, r:-1}, {c:9, r:0}, {c:9, r:1}, {c:9, r:2}
         ];
 
         grid.forEach(h => drawHex(h.c, h.r));
