@@ -2,32 +2,32 @@
 <html lang="ca">
 <head>
     <meta charset="UTF-8">
-    <title>Mapa Europa - Flat-Topped (CAD Precision)</title>
+    <title>Mapa Europa - Graella sobre Fons Blanc</title>
     <style>
-        body { margin: 0; background: #000; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        #container { position: relative; width: 90vw; height: auto; }
-        /* El viewBox s'encarrega de l'escala, el CSS només dimensiona el contenidor */
+        /* Fons blanc com has demanat */
+        body { margin: 0; background: #ffffff; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        #container { position: relative; width: 90vw; height: auto; border: 2px solid #000; }
         svg { width: 100%; height: auto; display: block; }
-        .hex { fill: none; stroke: #ff00ff; stroke-width: 20000; /* Gruix ajustat a l'escala real */ }
+        .hex { fill: none; stroke: #ff00ff; stroke-width: 20000; }
     </style>
 </head>
 <body>
     <div id="container">
         <svg viewBox="0 0 26757154 22877366" id="map">
-            <image href="Mapa europa-Layout2.jpg" width="26757154" height="22877366" />
+            <image href="https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/6898921c906330dcfbaaa4b3be8e8745a0800762/Mapa%20europa-Layout2.jpg" 
+                   width="26757154" height="22877366" />
         </svg>
     </div>
 
     <script>
         const svg = document.getElementById('map');
         
-        // Constants derivades de les teves coordenades (s = 797540.5)
         const s = 797540.5; 
         const H = 1381380; 
         const STEP_X = 1.5 * s;
         const STEP_Y = H;
         
-        // Punts d'inici calculats per al centre de l'hexàgon 4
+        // Ajusta aquests valors si la graella no quadra exactament amb el mapa
         const START_X = 2898289; 
         const START_Y = 2418393;
 
@@ -47,7 +47,6 @@
             svg.appendChild(poly);
         }
 
-        // Matriu de coordenades segons la teva imatge
         const grid = [
             {c:0, r:0}, {c:0, r:1}, {c:0, r:2},
             {c:1, r:-1}, {c:1, r:0}, {c:1, r:1}, {c:1, r:2},
