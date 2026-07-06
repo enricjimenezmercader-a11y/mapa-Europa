@@ -2,19 +2,18 @@
 <html lang="ca">
 <head>
     <meta charset="UTF-8">
-    <title>Mapa Europa - Graella sobre Fons Blanc</title>
+    <title>Mapa Europa - Graella CAD</title>
     <style>
-        /* Fons blanc com has demanat */
-        body { margin: 0; background: #ffffff; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        #container { position: relative; width: 90vw; height: auto; border: 2px solid #000; }
+        body { margin: 0; background: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        #container { position: relative; width: 90vw; }
         svg { width: 100%; height: auto; display: block; }
-        .hex { fill: none; stroke: #ff00ff; stroke-width: 20000; }
+        .hex { fill: none; stroke: #ff00ff; stroke-width: 40000; vector-effect: non-scaling-stroke; }
     </style>
 </head>
 <body>
     <div id="container">
         <svg viewBox="0 0 26757154 22877366" id="map">
-            <image href="https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/6898921c906330dcfbaaa4b3be8e8745a0800762/Mapa%20europa-Layout2.jpg" 
+            <image href="https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/main/Mapa%20europa-Layout2.jpg" 
                    width="26757154" height="22877366" />
         </svg>
     </div>
@@ -22,12 +21,13 @@
     <script>
         const svg = document.getElementById('map');
         
+        // Paràmetres basats en les dades de l'hexàgon 4
         const s = 797540.5; 
         const H = 1381380; 
         const STEP_X = 1.5 * s;
         const STEP_Y = H;
         
-        // Ajusta aquests valors si la graella no quadra exactament amb el mapa
+        // Origen basat en la posició de l'hexàgon 4
         const START_X = 2898289; 
         const START_Y = 2418393;
 
@@ -47,6 +47,7 @@
             svg.appendChild(poly);
         }
 
+        // Matriu de columnes (c) i files (r)
         const grid = [
             {c:0, r:0}, {c:0, r:1}, {c:0, r:2},
             {c:1, r:-1}, {c:1, r:0}, {c:1, r:1}, {c:1, r:2},
