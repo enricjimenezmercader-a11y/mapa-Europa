@@ -2,7 +2,7 @@
 <html lang="ca">
 <head>
     <meta charset="UTF-8">
-    <title>Mapa Europa - Graella Perfecta</title>
+    <title>Mapa Europa - Graella Ajustada</title>
     <style>
         body { 
             margin: 0; background: #222; 
@@ -11,13 +11,14 @@
         }
         #container { 
             width: 90vw; max-width: 1200px; 
-            /* Mantenim el ratio de la imatge original */
             aspect-ratio: 26757154 / 22877366; 
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
         svg { width: 100%; height: 100%; display: block; }
         .hex { 
-            fill: none; stroke: #ff00ff; stroke-width: 50000; 
+            fill: none; 
+            stroke: #ff00ff; 
+            stroke-width: 15000; /* Reduït de 50000 a 15000 per afinar el traç */
             vector-effect: non-scaling-stroke;
         }
     </style>
@@ -35,19 +36,13 @@
     <script>
         const svg = document.getElementById('map');
         
-        // Constants derivades dels vèrtexs del Hexàgon 4
-        // Amplada total del hexàgon = 3695830 - 2100749 = 1595081
-        // Alçada total del hexàgon = 3799774 - 1037013 = 2762761
+        // Constants
         const s = 1595081; 
         const H = 2762761; 
-        
-        // Centres calculats a partir dels punts del Hexàgon 4
         const START_CAD_X = 2898289.5; 
         const START_CAD_Y = 2418393.5;
-        
-        // Pas entre centres (ajustat per la teva graella)
-        const STEP_X = 1595081; // Distància horitzontal
-        const STEP_Y = 2762761; // Distància vertical
+        const STEP_X = 1595081; 
+        const STEP_Y = 2762761; 
 
         const grid = [
             {c:0, r:0}, {c:0, r:1}, {c:0, r:2}, {c:0, r:3},
@@ -63,17 +58,16 @@
         ];
 
         grid.forEach(h => {
-            // Càlcul de posició basada en els increments definits
             const cx = START_CAD_X + (h.c * STEP_X);
             const cy = START_CAD_Y + (h.r * STEP_Y) + (h.c % 2 !== 0 ? STEP_Y / 2 : 0);
             
             const points = [
-                {x: cx - s/2, y: cy - H/2}, // Top Left
-                {x: cx + s/2, y: cy - H/2}, // Top Right
-                {x: cx + s,   y: cy},       // Right
-                {x: cx + s/2, y: cy + H/2}, // Bot Right
-                {x: cx - s/2, y: cy + H/2}, // Bot Left
-                {x: cx - s,   y: cy}        // Left
+                {x: cx - s/2, y: cy - H/2},
+                {x: cx + s/2, y: cy - H/2},
+                {x: cx + s,   y: cy},       
+                {x: cx + s/2, y: cy + H/2},
+                {x: cx - s/2, y: cy + H/2},
+                {x: cx - s,   y: cy}        
             ];
 
             const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
