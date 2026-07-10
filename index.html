@@ -25,13 +25,13 @@
             transition: fill 0.3s ease;
         }
         
-        /* Classes colors - Opacitat 0.75 ajustada */
-        .p1 { fill: rgba(0, 0, 255, 0.75) !important; }
-        .p2 { fill: rgba(135, 206, 235, 0.75) !important; }
-        .p3 { fill: rgba(0, 128, 0, 0.75) !important; }
-        .p4 { fill: rgba(255, 0, 0, 0.75) !important; }
-        .p5 { fill: rgba(255, 69, 0, 0.75) !important; }
-        .p6 { fill: rgba(255, 165, 0, 0.75) !important; }
+        /* Classes colors - Opacitat ajustada al 33% (0.33) */
+        .p1 { fill: rgba(0, 0, 255, 0.33) !important; }
+        .p2 { fill: rgba(135, 206, 235, 0.33) !important; }
+        .p3 { fill: rgba(0, 128, 0, 0.33) !important; }
+        .p4 { fill: rgba(255, 0, 0, 0.33) !important; }
+        .p5 { fill: rgba(255, 69, 0, 0.33) !important; }
+        .p6 { fill: rgba(255, 165, 0, 0.33) !important; }
     </style>
 </head>
 <body>
@@ -114,11 +114,13 @@
 
                 rows.forEach((row) => {
                     const cols = row.split(',');
-                    // Suposem: Col 0 = ID Hexàgon (1-60), Col 1 = ID Jugador
                     const hexId = cols[0] ? cols[0].trim() : "";
                     const rawPlayer = cols[1] ? cols[1].trim() : "";
                     
-                    // Neteja per obtenir només el número
+                    // Si l'id no és un número vàlid (és "X" o buit), saltem la fila
+                    if (hexId === "X" || hexId === "") return;
+                    
+                    // Neteja per obtenir només el número del jugador
                     const playerNumber = rawPlayer.replace(/\D/g, '');
 
                     // Busquem el polígon per ID (ex: "hex1")
@@ -142,7 +144,7 @@
         // Executar inicialment
         updateMap();
         
-        // Actualitzar cada 60 segons automàticament
+        // Actualitzar cada 60 segons
         setInterval(updateMap, 60000);
     </script>
 </body>
