@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mapa d'Europa</title>
+    <title>Mapa d'Europa Temps Real</title>
     <style>
         html, body {
             margin: 0;
@@ -202,49 +202,52 @@
     </div>
 
     <script>
-       async function carregarDadesIColor() {
-        const scriptUrl = "https://script.google.com/macros/s/AKfycbx7QfmO1RGB27tNYsydPnoVumf4izpUGLKhHHp5N1FvMOpdsNlywp2bT_izBSQQH9sk/exec";
-        const proxyUrl = "https://api.allorigins.win/get?url=";
-        
-        try {
-            const response = await fetch(proxyUrl + encodeURIComponent(scriptUrl));
-            const wrapper = await response.json();
-            const data = JSON.parse(wrapper.contents);
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbxQiSpFVT70zxxl_s_aBqObHRLomx_mRDO_fp7CyfpFAnmuF4-BhBBf-tyiaV2x0Rzc/exec";
 
-            // --- DEPURACIÓ: MIRA LA CONSOLA ---
-            console.log("Dades rebudes:", data);
-            console.log("Primera fila:", data[0]);
-            // ---------------------------------
+        function carregarDadesIColor() {
+            const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
             
-            // Si veus que la clau no és 'Propietat', canvia 'Propietat' per la clau que vegis a la consola
-            const keyPropietat = "Propietat"; 
+            // Definim la funció que processarà les dades
+            window[callbackName] = function(data) {
+                // Neteja
+                delete window[callbackName];
+                const scriptTag = document.querySelector(`script[src*="${callbackName}"]`);
+                if(scriptTag) scriptTag.remove();
+                
+                // Lògica de pintat
+                const keyPropietat = "Propietat"; // Canvia això si al teu full de càlcul la columna té un altre nom
+                const propietaris = [...new Set(data.map(item => item[keyPropietat]))];
+                const paleta = ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEEAD", "#D4A5A5", "#9B59B6"];
+                const mapaColors = {};
+                
+                propietaris.forEach((p, index) => {
+                    mapaColors[p] = paleta[index % paleta.length];
+                });
 
-            const propietaris = [...new Set(data.map(item => item[keyPropietat]))];
-            
-            const paleta = ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEEAD", "#D4A5A5", "#9B59B6"];
-            const mapaColors = {};
-            propietaris.forEach((p, index) => {
-                mapaColors[p] = paleta[index % paleta.length];
-            });
-
-            const poligons = document.querySelectorAll('.hex-overlay polygon');
-
-            data.forEach((item, index) => {
-                if (poligons[index]) {
-                    const valorClau = item[keyPropietat];
-                    const color = mapaColors[valorClau];
-                    if (color) {
-                        poligons[index].style.fill = color;
-                        poligons[index].style.fillOpacity = "0.33";
+                const poligons = document.querySelectorAll('.hex-overlay polygon');
+                data.forEach((item, index) => {
+                    if (poligons[index]) {
+                        const valor = item[keyPropietat];
+                        const color = mapaColors[valor];
+                        if (color) {
+                            poligons[index].style.fill = color;
+                            poligons[index].style.fillOpacity = "0.6";
+                        }
                     }
-                }
-            });
+                });
+                console.log("Mapa actualitzat:", new Date().toLocaleTimeString());
+            };
 
-        } catch (error) {
-            console.error("Error carregant les dades:", error);
+            // Injectem el script per fer la crida JSONP
+            const script = document.createElement('script');
+            script.src = `${scriptUrl}?callback=${callbackName}&t=${new Date().getTime()}`;
+            document.body.appendChild(script);
         }
-    }
 
+        // Refrescar cada 3 segons
+        setInterval(carregarDadesIColor, 3000);
+        
+        // Càrrega inicial
         window.onload = carregarDadesIColor;
     </script>
 </body>
