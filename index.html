@@ -2,78 +2,215 @@
 <html lang="ca">
 <head>
     <meta charset="UTF-8">
-    <title>Mapa Interactiu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa d'Europa amb retícula hexagonal</title>
     <style>
-        /* ... mateixos estils anteriors ... */
-        .map-container { position: relative; width: 95vw; max-width: 1600px; aspect-ratio: 3840 / 2160; }
-        .map-container img { width: 100%; height: 100%; display: block; }
-        .hex-overlay { position: absolute; inset: 0; width: 100%; height: 100%; }
-        
-        /* Hexàgons normals */
-        .clickable { fill: transparent; stroke: #ff2b2b; stroke-width: 6; stroke-linejoin: round; cursor: pointer; }
-        .clickable:hover { fill: rgba(255, 255, 255, 0.2); }
-        
-        /* Hexàgons transparents (X) */
-        .transparent { stroke: transparent !important; fill: transparent !important; pointer-events: none; }
-        
-        #infoModal {
-            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: white; padding: 25px; border-radius: 12px; z-index: 1000;
-            max-width: 400px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.5); font-family: sans-serif;
+        html, body {
+            margin: 0;
+            padding: 0;
+            min-height: 100%;
+            background: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        #infoModal.active { display: block; }
-        .close-btn { cursor: pointer; float: right; font-weight: bold; }
+        .map-container {
+            position: relative;
+            width: 95vw;
+            max-width: 1600px;
+            aspect-ratio: 3840 / 2160;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+        .map-container img {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .hex-overlay {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .hex-overlay polygon {
+            fill: transparent;
+            stroke: #ff2b2b;
+            stroke-width: 6;
+            stroke-linejoin: round;
+        }
+        .hex-overlay text {
+            fill: #ffffff;
+            font-family: Arial, sans-serif;
+            font-size: 72px;
+            font-weight: 700;
+            paint-order: stroke;
+            stroke: #000;
+            stroke-width: 4;
+        }
+        /* Classe per ocultar els hexàgons seleccionats */
+        .transparent {
+            stroke: transparent !important;
+            fill: transparent !important;
+        }
     </style>
 </head>
 <body>
-
-<div class="map-container">
-    <img src="https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/6898921c906330dcfbaaa4b3be8e8745a0800762/Mapa%20europa-Layout2.jpg" alt="Mapa">
-    <svg class="hex-overlay" viewBox="0 0 3840 2160" preserveAspectRatio="none">
-        
-        <polygon class="transparent" points="1011.67,354.84 934.83,487.92 781.17,487.92 704.33,354.84 781.17,221.76 934.83,221.76"/>
-        
-        <polygon data-id="3" class="clickable" points="1011.67,887.16 934.83,1020.24 781.17,1020.24 704.33,887.16 781.17,754.08 934.83,754.08"/>
-        
-        </svg>
-</div>
-
-<div id="infoModal">
-    <span class="close-btn" onclick="closeModal()">X</span>
-    <h2 id="modalTitle"></h2>
-    <p id="modalContent"></p>
-</div>
-
-<script>
-    // DADES: Omple els valors aquí
-    const hexData = {
-        3: { titol: "Hexàgon 3", info: "Informació de la fila X del teu excel" },
-        4: { titol: "Hexàgon 4", info: "Informació de la fila Y..." }
-    };
-
-    // LOGICA: Selecciona NOMÉS els que tenen la classe .clickable
-    const hexagons = document.querySelectorAll('.clickable');
-    const modal = document.getElementById('infoModal');
-
-    hexagons.forEach(hex => {
-        hex.addEventListener('click', () => {
-            const id = hex.getAttribute('data-id');
-            const data = hexData[id];
+    <div class="map-container">
+        <img src="https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/6898921c906330dcfbaaa4b3be8e8745a0800762/Mapa%20europa-Layout2.jpg" alt="Mapa d'Europa">
+        <svg class="hex-overlay" viewBox="0 0 3840 2160" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
             
-            if(data) {
-                document.getElementById('modalTitle').innerText = data.titol;
-                document.getElementById('modalContent').innerText = data.info;
-                modal.classList.add('active');
-            } else {
-                console.warn("No hi ha dades configurades per l'ID: " + id);
-            }
-        });
-    });
+            <polygon class="transparent" points="1011.67,354.84 934.83,487.92 781.17,487.92 704.33,354.84 781.17,221.76 934.83,221.76"/>
+            <polygon class="transparent" points="1011.67,621.00 934.83,754.08 781.17,754.08 704.33,621.00 781.17,487.92 934.83,487.92"/>
+            <polygon points="1011.67,887.16 934.83,1020.24 781.17,1020.24 704.33,887.16 781.17,754.08 934.83,754.08"/>
+            <polygon points="1011.67,1153.32 934.83,1286.40 781.17,1286.40 704.33,1153.32 781.17,1020.24 934.83,1020.24"/>
+            <polygon class="transparent" points="1011.67,1419.48 934.83,1552.55 781.17,1552.55 704.33,1419.48 781.17,1286.40 934.83,1286.40"/>
+            <polygon points="1011.67,1685.63 934.83,1818.71 781.17,1818.71 704.33,1685.63 781.17,1552.55 934.83,1552.55"/>
+            <polygon points="1011.67,1951.79 934.83,2084.87 781.17,2084.87 704.33,1951.79 781.17,1818.71 934.83,1818.71"/>
+            
+            <polygon class="transparent" points="1242.17,221.84 1165.33,354.92 1011.67,354.92 934.83,221.84 1011.67,88.76 1165.33,88.76"/>
+            <polygon class="transparent" points="1242.17,488.00 1165.33,621.08 1011.67,621.08 934.83,488.00 1011.67,354.92 1165.33,354.92"/>
+            <polygon points="1242.17,754.16 1165.33,887.24 1011.67,887.24 934.83,754.16 1011.67,621.08 1165.33,621.08"/>
+            <polygon points="1242.17,1020.32 1165.33,1153.40 1011.67,1153.40 934.83,1020.32 1011.67,887.24 1165.33,887.24"/>
+            <polygon points="1242.17,1286.48 1165.33,1419.55 1011.67,1419.55 934.83,1286.48 1011.67,1153.40 1165.33,1153.40"/>
+            <polygon points="1242.17,1552.63 1165.33,1685.71 1011.67,1685.71 934.83,1552.63 1011.67,1419.55 1165.33,1419.55"/>
+            <polygon points="1242.17,1818.79 1165.33,1951.87 1011.67,1951.87 934.83,1818.79 1011.67,1685.71 1165.33,1685.71"/>
+            
+            <polygon class="transparent" points="1472.67,354.84 1395.83,487.92 1242.17,487.92 1165.33,354.84 1242.17,221.76 1395.83,221.76"/>
+            <polygon class="transparent" points="1472.67,621.00 1395.83,754.08 1242.17,754.08 1165.33,621.00 1242.17,487.92 1395.83,487.92"/>
+            <polygon class="transparent" points="1472.67,887.16 1395.83,1020.24 1242.17,1020.24 1165.33,887.16 1242.17,754.08 1395.83,754.08"/>
+            <polygon points="1472.67,1153.32 1395.83,1286.40 1242.17,1286.40 1165.33,1153.32 1242.17,1020.24 1395.83,1020.24"/>
+            <polygon points="1472.67,1419.48 1395.83,1552.55 1242.17,1552.55 1165.33,1419.48 1242.17,1286.40 1395.83,1286.40"/>
+            <polygon points="1472.67,1685.63 1395.83,1818.71 1242.17,1818.71 1165.33,1685.63 1242.17,1552.55 1395.83,1552.55"/>
+            <polygon class="transparent" points="1472.67,1951.79 1395.83,2084.87 1242.17,2084.87 1165.33,1951.79 1242.17,1818.71 1395.83,1818.71"/>
 
-    function closeModal() {
-        modal.classList.remove('active');
-    }
-</script>
+            <polygon class="transparent" points="1703.17,221.84 1626.33,354.92 1472.67,354.92 1395.83,221.84 1472.67,88.76 1626.33,88.76"/>
+            <polygon points="1703.17,488.00 1626.33,621.08 1472.67,621.08 1395.83,488.00 1472.67,354.92 1626.33,354.92"/>
+            <polygon points="1703.17,754.16 1626.33,887.24 1472.67,887.24 1395.83,754.16 1472.67,621.08 1626.33,621.08"/>
+            <polygon points="1703.17,1020.32 1626.33,1153.40 1472.67,1153.40 1395.83,1020.32 1472.67,887.24 1626.33,887.24"/>
+            <polygon points="1703.17,1286.48 1626.33,1419.55 1472.67,1419.55 1395.83,1286.48 1472.67,1153.40 1626.33,1153.40"/>
+            <polygon points="1703.17,1552.63 1626.33,1685.71 1472.67,1685.71 1395.83,1552.63 1472.67,1419.55 1626.33,1419.55"/>
+            <polygon points="1703.17,1818.79 1626.33,1951.87 1472.67,1951.87 1395.83,1818.79 1472.67,1685.71 1626.33,1685.71"/>
+            
+            <polygon points="1933.67,354.84 1856.83,487.92 1703.17,487.92 1626.33,354.84 1703.17,221.76 1856.83,221.76"/>
+            <polygon points="1933.67,621.00 1856.83,754.08 1703.17,754.08 1626.33,621.00 1703.17,487.92 1856.83,487.92"/>
+            <polygon points="1933.67,887.16 1856.83,1020.24 1703.17,1020.24 1626.33,887.16 1703.17,754.08 1856.83,754.08"/>
+            <polygon points="1933.67,1153.32 1856.83,1286.40 1703.17,1286.40 1626.33,1153.32 1703.17,1020.24 1856.83,1020.24"/>
+            <polygon points="1933.67,1419.48 1856.83,1552.55 1703.17,1552.55 1626.33,1419.48 1703.17,1286.40 1856.83,1286.40"/>
+            <polygon points="1933.67,1685.63 1856.83,1818.71 1703.17,1818.71 1626.33,1685.63 1703.17,1552.55 1856.83,1552.55"/>
+            <polygon points="1933.67,1951.79 1856.83,2084.87 1703.17,2084.87 1626.33,1951.79 1703.17,1818.71 1856.83,1818.71"/>
+            
+            <polygon points="2164.17,221.84 2087.33,354.92 1933.67,354.92 1856.83,221.84 1933.67,88.76 2087.33,88.76"/>
+            <polygon points="2164.17,488.00 2087.33,621.08 1933.67,621.08 1856.83,488.00 1933.67,354.92 2087.33,354.92"/>
+            <polygon points="2164.17,754.16 2087.33,887.24 1933.67,887.24 1856.83,754.16 1933.67,621.08 2087.33,621.08"/>
+            <polygon points="2164.17,1020.32 2087.33,1153.40 1933.67,1153.40 1856.83,1020.32 1933.67,887.24 2087.33,887.24"/>
+            <polygon points="2164.17,1286.48 2087.33,1419.55 1933.67,1419.55 1856.83,1286.48 1933.67,1153.40 2087.33,1153.40"/>
+            <polygon points="2164.17,1552.63 2087.33,1685.71 1933.67,1685.71 1856.83,1552.63 1933.67,1419.55 2087.33,1419.55"/>
+            <polygon points="2164.17,1818.79 2087.33,1951.87 1933.67,1951.87 1856.83,1818.79 1933.67,1685.71 2087.33,1685.71"/>
+            
+            <polygon points="2394.67,354.84 2317.83,487.92 2164.17,487.92 2087.33,354.84 2164.17,221.76 2317.83,221.76"/>
+            <polygon points="2394.67,621.00 2317.83,754.08 2164.17,754.08 2087.33,621.00 2164.17,487.92 2317.83,487.92"/>
+            <polygon points="2394.67,887.16 2317.83,1020.24 2164.17,1020.24 2087.33,887.16 2164.17,754.08 2317.83,754.08"/>
+            <polygon points="2394.67,1153.32 2317.83,1286.40 2164.17,1286.40 2087.33,1153.32 2164.17,1020.24 2317.83,1020.24"/>
+            <polygon points="2394.67,1419.48 2317.83,1552.55 2164.17,1552.55 2087.33,1419.48 2164.17,1286.40 2317.83,1286.40"/>
+            <polygon points="2394.67,1685.63 2317.83,1818.71 2164.17,1818.71 2087.33,1685.63 2164.17,1552.55 2317.83,1552.55"/>
+            <polygon points="2394.67,1951.79 2317.83,2084.87 2164.17,2084.87 2087.33,1951.79 2164.17,1818.71 2317.83,1818.71"/>
+            
+            <polygon points="2625.17,221.84 2548.33,354.92 2394.67,354.92 2317.83,221.84 2394.67,88.76 2548.33,88.76"/>
+            <polygon points="2625.17,488.00 2548.33,621.08 2394.67,621.08 2317.83,488.00 2394.67,354.92 2548.33,354.92"/>
+            <polygon points="2625.17,754.16 2548.33,887.24 2394.67,887.24 2317.83,754.16 2394.67,621.08 2548.33,621.08"/>
+            <polygon points="2625.17,1020.32 2548.33,1153.40 2394.67,1153.40 2317.83,1020.32 2394.67,887.24 2548.33,887.24"/>
+            <polygon points="2625.17,1286.48 2548.33,1419.55 2394.67,1419.55 2317.83,1286.48 2394.67,1153.40 2548.33,1153.40"/>
+            <polygon points="2625.17,1552.63 2548.33,1685.71 2394.67,1685.71 2317.83,1552.63 2394.67,1419.55 2548.33,1419.55"/>
+            <polygon points="2625.17,1818.79 2548.33,1951.87 2394.67,1951.87 2317.83,1818.79 2394.67,1685.71 2548.33,1685.71"/>
+            
+            <polygon points="2855.67,354.84 2778.83,487.92 2625.17,487.92 2548.33,354.84 2625.17,221.76 2778.83,221.76"/>
+            <polygon points="2855.67,621.00 2778.83,754.08 2625.17,754.08 2548.33,621.00 2625.17,487.92 2778.83,487.92"/>
+            <polygon points="2855.67,887.16 2778.83,1020.24 2625.17,1020.24 2548.33,887.16 2625.17,754.08 2778.83,754.08"/>
+            <polygon points="2855.67,1153.32 2778.83,1286.40 2625.17,1286.40 2548.33,1153.32 2625.17,1020.24 2778.83,1020.24"/>
+            <polygon points="2855.67,1419.48 2778.83,1552.55 2625.17,1552.55 2548.33,1419.48 2625.17,1286.40 2778.83,1286.40"/>
+            <polygon points="2855.67,1685.63 2778.83,1818.71 2625.17,1818.71 2548.33,1685.63 2625.17,1552.55 2778.83,1552.55"/>
+            <polygon points="2855.67,1951.79 2778.83,2084.87 2625.17,2084.87 2548.33,1951.79 2625.17,1818.71 2778.83,1818.71"/>
 
+            <polygon points="3086.17,221.84 3009.33,354.92 2855.67,354.92 2778.83,221.84 2855.67,88.76 3009.33,88.76"/>
+            <polygon points="3086.17,488.00 3009.33,621.08 2855.67,621.08 2778.83,488.00 2855.67,354.92 3009.33,354.92"/>
+            <polygon points="3086.17,754.16 3009.33,887.24 2855.67,887.24 2778.83,754.16 2855.67,621.08 3009.33,621.08"/>
+            <polygon points="3086.17,1020.32 3009.33,1153.40 2855.67,1153.40 2778.83,1020.32 2855.67,887.24 3009.33,887.24"/>
+            <polygon points="3086.17,1286.48 3009.33,1419.55 2855.67,1419.55 2778.83,1286.48 2855.67,1153.40 3009.33,1153.40"/>
+            <polygon points="3086.17,1552.63 3009.33,1685.71 2855.67,1685.71 2778.83,1552.63 2855.67,1419.55 3009.33,1419.55"/>
+            <polygon points="3086.17,1818.79 3009.33,1951.87 2855.67,1951.87 2778.83,1818.79 2855.67,1685.71 3009.33,1685.71"/>
+
+            <text class="transparent" x="858.0" y="389.84" text-anchor="middle">X</text>
+            <text class="transparent" x="858.0" y="656.00" text-anchor="middle">X</text>
+            <text x="858.0" y="922.16" text-anchor="middle">1</text>
+            <text x="858.0" y="1188.32" text-anchor="middle">2</text>
+            <text class="transparent" x="858.0" y="1454.48" text-anchor="middle">X</text>
+            <text x="858.0" y="1720.63" text-anchor="middle">3</text>
+            <text x="858.0" y="1986.79" text-anchor="middle">4</text>
+            <text class="transparent" x="1088.5" y="256.84" text-anchor="middle">X</text>
+            <text class="transparent" x="1088.5" y="523.00" text-anchor="middle">X</text>
+            <text x="1088.5" y="789.16" text-anchor="middle">5</text>
+            <text x="1088.5" y="1055.32" text-anchor="middle">6</text>
+            <text x="1088.5" y="1321.48" text-anchor="middle">7</text>
+            <text x="1088.5" y="1587.63" text-anchor="middle">8</text>
+            <text x="1088.5" y="1853.79" text-anchor="middle">9</text>
+            <text class="transparent" x="1319.0" y="389.84" text-anchor="middle">X</text>
+            <text class="transparent" x="1319.0" y="656.00" text-anchor="middle">X</text>
+            <text class="transparent" x="1319.0" y="922.16" text-anchor="middle">X</text>
+            <text x="1319.0" y="1188.32" text-anchor="middle">10</text>
+            <text x="1319.0" y="1454.48" text-anchor="middle">11</text>
+            <text x="1319.0" y="1720.63" text-anchor="middle">12</text>
+            <text class="transparent" x="1319.0" y="1986.79" text-anchor="middle">X</text>
+            <text class="transparent" x="1549.5" y="256.8" text-anchor="middle">X</text>
+            <text x="1549.5" y="523.0" text-anchor="middle">13</text>
+            <text x="1549.5" y="789.2" text-anchor="middle">14</text>
+            <text x="1549.5" y="1055.3" text-anchor="middle">15</text>
+            <text x="1549.5" y="1321.5" text-anchor="middle">16</text>
+            <text x="1549.5" y="1587.6" text-anchor="middle">17</text>
+            <text x="1549.5" y="1853.8" text-anchor="middle">18</text>
+            <text x="1780.0" y="389.8" text-anchor="middle">19</text>
+            <text x="1780.0" y="656.0" text-anchor="middle">20</text>
+            <text x="1780.0" y="922.2" text-anchor="middle">21</text>
+            <text x="1780.0" y="1188.3" text-anchor="middle">22</text>
+            <text x="1780.0" y="1454.5" text-anchor="middle">23</text>
+            <text x="1780.0" y="1720.6" text-anchor="middle">24</text>
+            <text x="1780.0" y="1986.8" text-anchor="middle">25</text>
+            <text x="2010.5" y="256.8" text-anchor="middle">26</text>
+            <text x="2010.5" y="523.0" text-anchor="middle">27</text>
+            <text x="2010.5" y="789.2" text-anchor="middle">28</text>
+            <text x="2010.5" y="1055.3" text-anchor="middle">29</text>
+            <text x="2010.5" y="1321.5" text-anchor="middle">30</text>
+            <text x="2010.5" y="1587.6" text-anchor="middle">31</text>
+            <text x="2010.5" y="1853.8" text-anchor="middle">32</text>
+            <text x="2241.0" y="389.8" text-anchor="middle">33</text>
+            <text x="2241.0" y="656.0" text-anchor="middle">34</text>
+            <text x="2241.0" y="922.2" text-anchor="middle">35</text>
+            <text x="2241.0" y="1188.3" text-anchor="middle">36</text>
+            <text x="2241.0" y="1454.5" text-anchor="middle">37</text>
+            <text x="2241.0" y="1720.6" text-anchor="middle">38</text>
+            <text x="2241.0" y="1986.8" text-anchor="middle">39</text>
+            <text x="2471.5" y="256.8" text-anchor="middle">40</text>
+            <text x="2471.5" y="523.0" text-anchor="middle">41</text>
+            <text x="2471.5" y="789.2" text-anchor="middle">42</text>
+            <text x="2471.5" y="1055.3" text-anchor="middle">43</text>
+            <text x="2471.5" y="1321.5" text-anchor="middle">44</text>
+            <text x="2471.5" y="1587.6" text-anchor="middle">45</text>
+            <text x="2471.5" y="1853.8" text-anchor="middle">46</text>
+            <text x="2702.0" y="389.8" text-anchor="middle">47</text>
+            <text x="2702.0" y="656.0" text-anchor="middle">48</text>
+            <text x="2702.0" y="922.2" text-anchor="middle">49</text>
+            <text x="2702.0" y="1188.3" text-anchor="middle">50</text>
+            <text x="2702.0" y="1454.5" text-anchor="middle">51</text>
+            <text x="2702.0" y="1720.6" text-anchor="middle">52</text>
+            <text x="2702.0" y="1986.8" text-anchor="middle">53</text>
+            <text x="2932.5" y="256.8" text-anchor="middle">54</text>
+            <text x="2932.5" y="523.0" text-anchor="middle">55</text>
+            <text x="2932.5" y="789.2" text-anchor="middle">56</text>
+            <text x="2932.5" y="1055.3" text-anchor="middle">57</text>
+            <text x="2932.5" y="1321.5" text-anchor="middle">58</text>
+            <text x="2932.5" y="1587.6" text-anchor="middle">59</text>
+            <text x="2932.5" y="1853.8" text-anchor="middle">60</text>
+        </svg>
+    </div>
 </body>
 </html>
