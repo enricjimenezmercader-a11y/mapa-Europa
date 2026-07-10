@@ -32,8 +32,6 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            /* Augmentem la mida del viewBox per assegurar que es vegi el nou hexàgon */
-            overflow: visible; 
         }
         .hex-overlay polygon {
             fill: transparent;
@@ -55,7 +53,7 @@
 <body>
     <div class="map-container">
         <img src="https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/6898921c906330dcfbaaa4b3be8e8745a0800762/Mapa%20europa-Layout2.jpg" alt="Mapa d'Europa">
-        <svg class="hex-overlay" viewBox="0 0 3840 2300" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <svg class="hex-overlay" viewBox="0 0 3840 2160" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
             <polygon points="1011.67,354.84 934.83,487.92 781.17,487.92 704.33,354.84 781.17,221.76 934.83,221.76"/>
             <polygon points="1011.67,621.00 934.83,754.08 781.17,754.08 704.33,621.00 781.17,487.92 934.83,487.92"/>
             <polygon points="1011.67,887.16 934.83,1020.24 781.17,1020.24 704.33,887.16 781.17,754.08 934.83,754.08"/>
@@ -135,7 +133,6 @@
             <polygon points="3086.17,1286.48 3009.33,1419.55 2855.67,1419.55 2778.83,1286.48 2855.67,1153.40 3009.33,1153.40"/>
             <polygon points="3086.17,1552.63 3009.33,1685.71 2855.67,1685.71 2778.83,1552.63 2855.67,1419.55 3009.33,1419.55"/>
             <polygon points="3086.17,1818.79 3009.33,1951.87 2855.67,1951.87 2778.83,1818.79 2855.67,1685.71 3009.33,1685.71"/>
-            <polygon points="3086.17,2084.95 3009.33,2218.03 2855.67,2218.03 2778.83,2084.95 2855.67,1951.87 3009.33,1951.87"/>
 
             <text x="858.0" y="389.84" text-anchor="middle">1</text>
             <text x="858.0" y="656.00" text-anchor="middle">2</text>
@@ -207,7 +204,6 @@
             <text x="2932.5" y="1321.5" text-anchor="middle">68</text>
             <text x="2932.5" y="1587.6" text-anchor="middle">69</text>
             <text x="2932.5" y="1853.8" text-anchor="middle">70</text>
-            <text x="2932.5" y="2120.0" text-anchor="middle">71</text>
         </svg>
     </div>
 </body>
