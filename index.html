@@ -202,47 +202,48 @@
     </div>
 
     <script>
-        async function carregarDadesIColor() {
-            // URL del teu script
-            const scriptUrl = "https://script.google.com/macros/s/AKfycbx7QfmO1RGB27tNYsydPnoVumf4izpUGLKhHHp5N1FvMOpdsNlywp2bT_izBSQQH9sk/exec";
-            
-            // Proxy per saltar el problema de CORS
-            const proxyUrl = "https://api.allorigins.win/get?url=";
-            
-            try {
-                // Fem fetch a través del proxy
-                const response = await fetch(proxyUrl + encodeURIComponent(scriptUrl));
-                const wrapper = await response.json();
-                
-                // Les dades reals estan dins de "contents"
-                const data = JSON.parse(wrapper.contents);
-                
-                // 1. Identificar propietaris únics
-                const propietaris = [...new Set(data.map(item => item.Propietat))];
-                
-                // 2. Definir una paleta de 7 colors
-                const paleta = ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEEAD", "#D4A5A5", "#9B59B6"];
-                const mapaColors = {};
-                propietaris.forEach((p, index) => {
-                    mapaColors[p] = paleta[index % paleta.length];
-                });
+       async function carregarDadesIColor() {
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbx7QfmO1RGB27tNYsydPnoVumf4izpUGLKhHHp5N1FvMOpdsNlywp2bT_izBSQQH9sk/exec";
+        const proxyUrl = "https://api.allorigins.win/get?url=";
+        
+        try {
+            const response = await fetch(proxyUrl + encodeURIComponent(scriptUrl));
+            const wrapper = await response.json();
+            const data = JSON.parse(wrapper.contents);
 
-                // 3. Seleccionar tots els polígons
-                const poligons = document.querySelectorAll('.hex-overlay polygon');
+            // --- DEPURACIÓ: MIRA LA CONSOLA ---
+            console.log("Dades rebudes:", data);
+            console.log("Primera fila:", data[0]);
+            // ---------------------------------
+            
+            // Si veus que la clau no és 'Propietat', canvia 'Propietat' per la clau que vegis a la consola
+            const keyPropietat = "Propietat"; 
 
-                // 4. Aplicar color segons l'índex
-                data.forEach((item, index) => {
-                    if (poligons[index]) {
-                        const color = mapaColors[item.Propietat];
+            const propietaris = [...new Set(data.map(item => item[keyPropietat]))];
+            
+            const paleta = ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEEAD", "#D4A5A5", "#9B59B6"];
+            const mapaColors = {};
+            propietaris.forEach((p, index) => {
+                mapaColors[p] = paleta[index % paleta.length];
+            });
+
+            const poligons = document.querySelectorAll('.hex-overlay polygon');
+
+            data.forEach((item, index) => {
+                if (poligons[index]) {
+                    const valorClau = item[keyPropietat];
+                    const color = mapaColors[valorClau];
+                    if (color) {
                         poligons[index].style.fill = color;
                         poligons[index].style.fillOpacity = "0.33";
                     }
-                });
+                }
+            });
 
-            } catch (error) {
-                console.error("Error carregant les dades del mapa:", error);
-            }
+        } catch (error) {
+            console.error("Error carregant les dades:", error);
         }
+    }
 
         window.onload = carregarDadesIColor;
     </script>
