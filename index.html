@@ -25,7 +25,7 @@
             transition: fill 0.3s ease;
         }
         
-        /* Classes colors - Opacitat ajustada al 33% (0.33) */
+        /* Classes colors - Opacitat 33% */
         .p1 { fill: rgba(0, 0, 255, 0.33) !important; }
         .p2 { fill: rgba(135, 206, 235, 0.33) !important; }
         .p3 { fill: rgba(0, 128, 0, 0.33) !important; }
@@ -103,13 +103,14 @@
 
     <script>
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQSXG5q9DZ3kf6Yp-QFRuxNEqfY9HMl893gl20F_jRfOLgL4IY2uscaJIEV1bswQa4WweZhv7dDWQH7/pub?output=csv';
+        // Hexàgons que han de quedar sempre transparents
+        const excludedHexIds = new Set(["1", "2", "5", "8", "9", "15", "16", "17", "21", "22"]);
 
         async function updateMap() {
             try {
                 const response = await fetch(csvUrl);
                 const data = await response.text();
                 
-                // Separem per línies i traiem la capçalera
                 const rows = data.split(/\r?\n/).filter(row => row.trim() !== "").slice(1);
 
                 rows.forEach((row) => {
@@ -117,20 +118,14 @@
                     const hexId = cols[0] ? cols[0].trim() : "";
                     const rawPlayer = cols[1] ? cols[1].trim() : "";
                     
-                    // Si l'id no és un número vàlid (és "X" o buit), saltem la fila
-                    if (hexId === "X" || hexId === "") return;
+                    // Si l'ID és buit, "X", o un dels hexàgons exclosos, saltem
+                    if (hexId === "X" || hexId === "" || excludedHexIds.has(hexId)) return;
                     
-                    // Neteja per obtenir només el número del jugador
                     const playerNumber = rawPlayer.replace(/\D/g, '');
-
-                    // Busquem el polígon per ID (ex: "hex1")
                     const polygon = document.getElementById('hex' + hexId);
 
                     if (polygon) {
-                        // Neteja classes anteriors
                         polygon.className.baseVal = '';
-                        
-                        // Apliquem la nova classe si el número és vàlid
                         if (playerNumber !== "") {
                             polygon.classList.add('p' + playerNumber);
                         }
@@ -141,10 +136,7 @@
             }
         }
 
-        // Executar inicialment
         updateMap();
-        
-        // Actualitzar cada 60 segons
         setInterval(updateMap, 60000);
     </script>
 </body>
