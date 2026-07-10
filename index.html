@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapa d'Europa Temps Real</title>
     <style>
-        html, body { margin: 0; padding: 0; min-height: 100%; background: #1a1a1a; display: flex; justify-content: center; align-items: center; }
-        .map-container { position: relative; width: 95vw; max-width: 1600px; aspect-ratio: 3840 / 2160; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
-        .map-container img { width: 100%; height: 100%; display: block; }
-        .hex-overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+        html, body { margin: 0; padding: 0; background: #1a1a1a; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .map-container { position: relative; width: 95vw; max-width: 1600px; }
+        .map-container img { width: 100%; height: auto; display: block; }
+        .hex-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
         .hex-overlay polygon { fill: transparent; stroke: #ff2b2b; stroke-width: 6; stroke-linejoin: round; transition: fill 0.5s ease; }
         .hex-overlay text { fill: #ffffff; font-family: Arial, sans-serif; font-size: 72px; font-weight: 700; stroke: #000; stroke-width: 4; pointer-events: none; }
     </style>
@@ -165,34 +165,28 @@
     <script>
         const scriptUrl = "https://script.google.com/macros/s/AKfycbxQiSpFVT70zxxl_s_aBqObHRLomx_mRDO_fp7CyfpFAnmuF4-BhBBf-tyiaV2x0Rzc/exec";
 
-        function carregarDadesIColor() {
+        function carregarDades() {
             const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
             
             window[callbackName] = function(data) {
-                delete window[callbackName];
-                const scriptTag = document.querySelector(`script[src*="${callbackName}"]`);
-                if(scriptTag) scriptTag.remove();
+                console.log("Dades rebudes:", data);
                 
-                const keyPropietat = "Propietat"; 
                 const poligons = document.querySelectorAll('.hex-overlay polygon');
-                const paleta = ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEEAD", "#D4A5A5", "#9B59B6"];
-                const mapaColors = {};
-                let indexColor = 0;
+                // Paleta de colors senzilla per anar provant
+                const mapaColors = {
+                    "Jugador 1": "rgba(255, 0, 0, 0.4)",
+                    "Jugador 2": "rgba(0, 0, 255, 0.4)",
+                    "Jugador 3": "rgba(0, 255, 0, 0.4)",
+                    "Jugador 4": "rgba(255, 255, 0, 0.4)"
+                };
 
                 data.forEach((item, index) => {
-                    const nomJugador = item[keyPropietat];
-                    if (nomJugador) {
-                        if (!mapaColors[nomJugador]) {
-                            mapaColors[nomJugador] = paleta[indexColor % paleta.length];
-                            indexColor++;
-                        }
-                        if (poligons[index]) {
-                            poligons[index].style.fill = mapaColors[nomJugador];
-                            poligons[index].style.fillOpacity = "0.6";
-                        }
+                    const nomJugador = item["Propietat"];
+                    if (poligons[index] && nomJugador) {
+                        const color = mapaColors[nomJugador] || "transparent";
+                        poligons[index].style.fill = color;
                     }
                 });
-                console.log("Mapa actualitzat correctament.");
             };
 
             const script = document.createElement('script');
@@ -200,8 +194,9 @@
             document.body.appendChild(script);
         }
 
-        setInterval(carregarDadesIColor, 3000);
-        window.onload = carregarDadesIColor;
+        // Carrega inicial i refresc cada 5 segons
+        carregarDades();
+        setInterval(carregarDades, 5000);
     </script>
 </body>
 </html>
