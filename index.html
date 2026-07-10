@@ -203,11 +203,19 @@
 
     <script>
         async function carregarDadesIColor() {
-            const url = "https://script.google.com/macros/s/AKfycbx7QfmO1RGB27tNYsydPnoVumf4izpUGLKhHHp5N1FvMOpdsNlywp2bT_izBSQQH9sk/exec";
+            // URL del teu script
+            const scriptUrl = "https://script.google.com/macros/s/AKfycbx7QfmO1RGB27tNYsydPnoVumf4izpUGLKhHHp5N1FvMOpdsNlywp2bT_izBSQQH9sk/exec";
+            
+            // Proxy per saltar el problema de CORS
+            const proxyUrl = "https://api.allorigins.win/get?url=";
             
             try {
-                const response = await fetch(url);
-                const data = await response.json();
+                // Fem fetch a través del proxy
+                const response = await fetch(proxyUrl + encodeURIComponent(scriptUrl));
+                const wrapper = await response.json();
+                
+                // Les dades reals estan dins de "contents"
+                const data = JSON.parse(wrapper.contents);
                 
                 // 1. Identificar propietaris únics
                 const propietaris = [...new Set(data.map(item => item.Propietat))];
