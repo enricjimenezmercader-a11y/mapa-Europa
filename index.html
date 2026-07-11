@@ -37,7 +37,6 @@
     <div class="map-container">
         <img src="https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/4c8c2114cb475d3b50a3c7eb8c0e3c99423b66b6/Mapa%20europa-Layout5.jpg" alt="Mapa">
         <svg class="hex-overlay" viewBox="0 0 3840 2160" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-            <g id="image-layer"></g>
             <polygon points="1011.67,354.84 934.83,487.92 781.17,487.92 704.33,354.84 781.17,221.76 934.83,221.76"/>
             <polygon points="1011.67,621.00 934.83,754.08 781.17,754.08 704.33,621.00 781.17,487.92 934.83,487.92"/>
             <polygon points="1011.67,887.16 934.83,1020.24 781.17,1020.24 704.33,887.16 781.17,754.08 934.83,754.08"/>
@@ -108,13 +107,14 @@
             <polygon points="3086.17,1286.48 3009.33,1419.55 2855.67,1419.55 2778.83,1286.48 2855.67,1153.40 3009.33,1153.40"/>
             <polygon points="3086.17,1552.63 3009.33,1685.71 2855.67,1685.71 2778.83,1552.63 2855.67,1419.55 3009.33,1419.55"/>
             <polygon points="3086.17,1818.79 3009.33,1951.87 2855.67,1951.87 2778.83,1818.79 2855.67,1685.71 3009.33,1685.71"/>
+            
+            <g id="image-layer"></g>
         </svg>
     </div>
 
     <script>
         const scriptUrl = "https://script.google.com/macros/s/AKfycby2bGAmT1O1DMj8QiQ8PVLtndy1OJTEsAUmBj0aTvfHxsWfVV2OL38zqkwF2WbZlPyh/exec";
         
-        // Diccionari de configuració d'imatges i colors
         const configJugadors = {
             "Jugador 1": { color: "rgba(255, 0, 0, 0.33)", img: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/174822030ea36b9f1cd147610f00fec3ed465937/GER.jpg" },
             "Jugador 2": { color: "rgba(255, 255, 0, 0.33)", img: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/174822030ea36b9f1cd147610f00fec3ed465937/ITA.jpg" },
@@ -147,14 +147,12 @@
                     const nomJugador = item["Propietat"];
                     
                     if (poligons[index]) {
-                        // 1. Gestionar color polígon
                         if (nomJugador && configJugadors[nomJugador.trim()]) {
                             poligons[index].style.fill = configJugadors[nomJugador.trim()].color;
                         } else {
                             poligons[index].style.fill = "rgba(255, 255, 255, 0)";
                         }
 
-                        // 2. Gestionar imatges per cada columna de jugador
                         Object.keys(configJugadors).forEach(jugadorClau => {
                             if (item[jugadorClau] == 1) {
                                 const center = calcularCentre(poligons[index].getAttribute('points'));
