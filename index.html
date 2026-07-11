@@ -18,13 +18,14 @@
 </head>
 <body>
 
-    <div id="status">Esperant dades...</div>
+    <div id="status">Carregant dades...</div>
     <button id="btnToggle">Amagar Ombrejat</button>
 
     <div class="map-container">
         <img src="https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/4c8c2114cb475d3b50a3c7eb8c0e3c99423b66b6/Mapa%20europa-Layout5.jpg" alt="Mapa">
         <svg class="hex-overlay" viewBox="0 0 3840 2160" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
             <g id="polygon-layer">
+                <!-- Hexàgons del mapa -->
                 <polygon points="1011.67,354.84 934.83,487.92 781.17,487.92 704.33,354.84 781.17,221.76 934.83,221.76"/>
                 <polygon points="1011.67,621.00 934.83,754.08 781.17,754.08 704.33,621.00 781.17,487.92 934.83,487.92"/>
                 <polygon points="1011.67,887.16 934.83,1020.24 781.17,1020.24 704.33,887.16 781.17,754.08 934.83,754.08"/>
@@ -96,7 +97,7 @@
                 <polygon points="3086.17,1552.63 3009.33,1685.71 2855.67,1685.71 2778.83,1552.63 2855.67,1419.55 3009.33,1419.55"/>
                 <polygon points="3086.17,1818.79 3009.33,1951.87 2855.67,1951.87 2778.83,1818.79 2855.67,1685.71 3009.33,1685.71"/>
             </g>
-            <g id="type-layer"></g> 
+            <g id="type-layer"></g>
             <g id="image-layer"></g>
         </svg>
     </div>
@@ -123,14 +124,14 @@
         };
 
         function calcularCentre(pointsString) {
-            const points = pointsString.split(' ').map(p => p.split(',').map(Number));
+            const points = pointsString.trim().split(/\s+/).map(p => p.split(',').map(Number));
             const xSum = points.reduce((sum, p) => sum + p[0], 0);
             const ySum = points.reduce((sum, p) => sum + p[1], 0);
             return { x: xSum / points.length, y: ySum / points.length };
         }
 
         function calcularVoraInferior(pointsString) {
-            const points = pointsString.split(' ').map(p => p.split(',').map(Number));
+            const points = pointsString.trim().split(/\s+/).map(p => p.split(',').map(Number));
             return Math.max(...points.map(p => p[1]));
         }
 
@@ -141,19 +142,16 @@
             
             window[callbackName] = function(data) {
                 status.innerText = "Dades actualitzades";
-                
                 const poligons = document.querySelectorAll('#polygon-layer polygon');
                 const typeLayer = document.getElementById('type-layer');
                 const imageLayer = document.getElementById('image-layer');
                 
-                // Netegem les capes per tornar-les a generar
                 typeLayer.innerHTML = '';
                 imageLayer.innerHTML = ''; 
 
                 data.forEach((item, index) => {
                     if (!poligons[index]) return;
 
-                    // 1. Gestionar color polígon (ombrejat)
                     const nomPropietari = item["Propietat"];
                     poligons[index].style.fill = (nomPropietari && configJugadors[nomPropietari]) 
                         ? configJugadors[nomPropietari].color 
@@ -161,37 +159,32 @@
 
                     const pointsStr = poligons[index].getAttribute('points');
                     const center = calcularCentre(pointsStr);
-
-                    // 2. Afegir icona de tipus de terreny
-                    const nomTipus = item["tipus"]; 
+                    const nomTipus = item["Tipus"] || item["tipus"]; 
+                    
                     if (nomTipus && configTipus[nomTipus]) {
-                        const midaIcona = 120; // 50% més gran (abans 80)
+                        const midaIcona = 120;
                         const voraInferiorY = calcularVoraInferior(pointsStr);
-                        
                         const imgTipus = document.createElementNS("http://www.w3.org/2000/svg", "image");
+                        imgTipus.setAttributeNS("http://www.w3.org/1999/xlink", "href", configTipus[nomTipus]);
                         imgTipus.setAttribute("href", configTipus[nomTipus]);
                         imgTipus.setAttribute("x", center.x - (midaIcona / 2));
-                        imgTipus.setAttribute("y", voraInferiorY - midaIcona - 3); // A 3px del costat inferior
+                        imgTipus.setAttribute("y", voraInferiorY - midaIcona - 3);
                         imgTipus.setAttribute("width", midaIcona);
                         imgTipus.setAttribute("height", midaIcona);
-                        
                         typeLayer.appendChild(imgTipus);
                     }
 
-                    // 3. Recollir totes les unitats presents
                     let unitsInHex = [];
                     Object.keys(configJugadors).forEach(jugadorClau => {
                         let count = parseInt(item[jugadorClau]) || 0;
-                        for(let i = 0; i < count; i++) {
-                            unitsInHex.push(configJugadors[jugadorClau].img);
-                        }
+                        for(let i = 0; i < count; i++) unitsInHex.push(configJugadors[jugadorClau].img);
                     });
 
-                    // 4. Dibuixar les unitats amb offset
                     const size = 100;
                     unitsInHex.forEach((imgUrl, i) => {
                         const offset = i * 16; 
                         const img = document.createElementNS("http://www.w3.org/2000/svg", "image");
+                        img.setAttributeNS("http://www.w3.org/1999/xlink", "href", imgUrl);
                         img.setAttribute("href", imgUrl);
                         img.setAttribute("x", (center.x - (size/2)) + offset);
                         img.setAttribute("y", (center.y - (size/2)) - offset);
@@ -200,26 +193,19 @@
                         imageLayer.appendChild(img);
                     });
                 });
-
                 delete window[callbackName];
                 script.remove();
             };
 
-            script.onerror = function() {
-                status.innerText = "Error de connexió";
-                delete window[callbackName];
-                script.remove();
-            };
-
+            script.onerror = () => { status.innerText = "Error de connexió"; delete window[callbackName]; script.remove(); };
             script.src = `${scriptUrl}?callback=${callbackName}&t=${new Date().getTime()}`;
             document.body.appendChild(script);
         }
 
-        const btnToggle = document.getElementById('btnToggle');
-        const polygonLayer = document.getElementById('polygon-layer');
-        btnToggle.addEventListener('click', () => {
-            polygonLayer.classList.toggle('hidden');
-            btnToggle.innerText = polygonLayer.classList.contains('hidden') ? "Mostrar Ombrejat" : "Amagar Ombrejat";
+        document.getElementById('btnToggle').addEventListener('click', (e) => {
+            const layer = document.getElementById('polygon-layer');
+            layer.classList.toggle('hidden');
+            e.target.innerText = layer.classList.contains('hidden') ? "Mostrar Ombrejat" : "Amagar Ombrejat";
         });
 
         carregarDades();
