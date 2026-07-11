@@ -112,11 +112,27 @@
             "Jugador 6": { color: "rgba(100, 0, 100, 0.33)", img: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/174822030ea36b9f1cd147610f00fec3ed465937/US2.jpg" }
         };
 
+        // Diccionari afegit amb les rutes transformades a 'raw.githubusercontent'
+        const configTipus = {
+            "Zona agrícola/Pla": "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/75e55d1169cac4b1b61e571b87807f3dca695f01/_Zona%20agricola.png",
+            "Desert/Montanya/Tundra": "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/75e55d1169cac4b1b61e571b87807f3dca695f01/_Muntanya.png",
+            "Ciutat menor": "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/75e55d1169cac4b1b61e571b87807f3dca695f01/_Ciutat%20menor.png",
+            "Ciutat major": "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/75e55d1169cac4b1b61e571b87807f3dca695f01/_Ciutat%20major.png",
+            "Zona industrial": "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/75e55d1169cac4b1b61e571b87807f3dca695f01/_Zona%20Industrial.png",
+            "Pous petrolifers": "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/75e55d1169cac4b1b61e571b87807f3dca695f01/_Pous%20petrolifers.png"
+        };
+
         function calcularCentre(pointsString) {
             const points = pointsString.split(' ').map(p => p.split(',').map(Number));
             const xSum = points.reduce((sum, p) => sum + p[0], 0);
             const ySum = points.reduce((sum, p) => sum + p[1], 0);
             return { x: xSum / points.length, y: ySum / points.length };
+        }
+
+        // Nova funció per calcular el punt Y més baix de l'hexàgon
+        function calcularVoraInferior(pointsString) {
+            const points = pointsString.split(' ').map(p => p.split(',').map(Number));
+            return Math.max(...points.map(p => p[1]));
         }
 
         function carregarDades() {
@@ -140,7 +156,28 @@
                         ? configJugadors[nomPropietari].color 
                         : "rgba(255, 255, 255, 0)";
 
-                    // 2. Recollir totes les unitats presents en aquest hexàgon
+                    const pointsStr = poligons[index].getAttribute('points');
+                    const center = calcularCentre(pointsStr);
+
+                    // 2. Afegir icona corresponent a la columna "tipus"
+                    const nomTipus = item["Tipus"]; // Si la columna es diu "Tipus", canvia-ho aquí
+                    if (nomTipus && configTipus[nomTipus]) {
+                        const midaIcona = 80; // Pots ajustar la mida d'aquesta icona aquí
+                        const voraInferiorY = calcularVoraInferior(pointsStr);
+                        
+                        const imgTipus = document.createElementNS("http://www.w3.org/2000/svg", "image");
+                        imgTipus.setAttribute("href", configTipus[nomTipus]);
+                        // Centrat horitzontalment:
+                        imgTipus.setAttribute("x", center.x - (midaIcona / 2));
+                        // 10 píxels per sobre del costat inferior:
+                        imgTipus.setAttribute("y", voraInferiorY - midaIcona - 10);
+                        imgTipus.setAttribute("width", midaIcona);
+                        imgTipus.setAttribute("height", midaIcona);
+                        
+                        imageLayer.appendChild(imgTipus);
+                    }
+
+                    // 3. Recollir totes les unitats presents en aquest hexàgon
                     let unitsInHex = [];
                     Object.keys(configJugadors).forEach(jugadorClau => {
                         let count = parseInt(item[jugadorClau]) || 0;
@@ -149,15 +186,12 @@
                         }
                     });
 
-                    // 3. Dibuixar les unitats amb offset
-                    const center = calcularCentre(poligons[index].getAttribute('points'));
+                    // 4. Dibuixar les unitats amb offset
                     const size = 100;
-                    
                     unitsInHex.forEach((imgUrl, i) => {
-                        const offset = i * 16; // 3px per unitat
+                        const offset = i * 16; 
                         const img = document.createElementNS("http://www.w3.org/2000/svg", "image");
                         img.setAttribute("href", imgUrl);
-                        // X creix cap a la dreta (+), Y decreix cap a dalt (-)
                         img.setAttribute("x", (center.x - (size/2)) + offset);
                         img.setAttribute("y", (center.y - (size/2)) - offset);
                         img.setAttribute("width", size);
