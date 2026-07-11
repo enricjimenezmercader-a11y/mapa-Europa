@@ -24,10 +24,10 @@
     <div id="status">Carregant dades...</div>
     <button id="btnToggle">Amagar Ombrejat</button>
 
-    <!-- Finestra flotant -->
     <div id="info-box">
         <h3 id="info-propietat"></h3>
         <p id="info-tipus"></p>
+        <p id="info-index"></p>
     </div>
 
     <div class="map-container">
@@ -173,6 +173,7 @@
                         } else {
                             document.getElementById('info-propietat').innerText = "Propietat: " + (item["Propietat"] || "N/A");
                             document.getElementById('info-tipus').innerText = "Tipus: " + (item["Tipus"] || item["tipus"] || "N/A");
+                            document.getElementById('info-index').innerText = "Hexàgon: " + (index + 1);
                             infoBox.style.display = 'block';
                         }
                     };
