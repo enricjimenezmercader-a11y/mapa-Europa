@@ -13,7 +13,6 @@
         
         #status { position: fixed; top: 10px; left: 10px; color: white; background: rgba(0,0,0,0.7); padding: 10px; z-index: 1000; border-radius: 5px; }
         
-        /* Estils nous pel botó */
         #btnToggle { 
             position: fixed; 
             top: 60px; 
@@ -27,10 +26,7 @@
             border-radius: 5px; 
         }
 
-        /* Classe per ocultar l'SVG */
-        .hidden { 
-            display: none; 
-        }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
@@ -41,6 +37,7 @@
     <div class="map-container">
         <img src="https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/4c8c2114cb475d3b50a3c7eb8c0e3c99423b66b6/Mapa%20europa-Layout5.jpg" alt="Mapa">
         <svg class="hex-overlay" viewBox="0 0 3840 2160" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <g id="image-layer"></g>
             <polygon points="1011.67,354.84 934.83,487.92 781.17,487.92 704.33,354.84 781.17,221.76 934.83,221.76"/>
             <polygon points="1011.67,621.00 934.83,754.08 781.17,754.08 704.33,621.00 781.17,487.92 934.83,487.92"/>
             <polygon points="1011.67,887.16 934.83,1020.24 781.17,1020.24 704.33,887.16 781.17,754.08 934.83,754.08"/>
@@ -116,8 +113,8 @@
 
     <script>
         const scriptUrl = "https://script.google.com/macros/s/AKfycby2bGAmT1O1DMj8QiQ8PVLtndy1OJTEsAUmBj0aTvfHxsWfVV2OL38zqkwF2WbZlPyh/exec";
+        const IMG_URL = "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/d67b2c23490d7f80ea46d51a912e1d23fe28b7f1/GER.jpg";
 
-        // Diccionari de colors pels jugadors
         const colorsJugadors = {
             "Jugador 1": "rgba(255, 0, 0, 0.33)",
             "Jugador 2": "rgba(255, 255, 0, 0.33)",
@@ -127,26 +124,49 @@
             "Jugador 6": "rgba(100, 0, 100, 0.33)"
         };
 
-        // Funció per carregar dades
+        // Funció per calcular el centre d'un polígon a partir dels seus punts
+        function calcularCentre(pointsString) {
+            const points = pointsString.split(' ').map(p => p.split(',').map(Number));
+            const xSum = points.reduce((sum, p) => sum + p[0], 0);
+            const ySum = points.reduce((sum, p) => sum + p[1], 0);
+            return { x: xSum / points.length, y: ySum / points.length };
+        }
+
         function carregarDades() {
             const status = document.getElementById('status');
             const callbackName = 'callback_' + Math.round(100000 * Math.random());
-            
             const script = document.createElement('script');
             
             window[callbackName] = function(data) {
                 status.innerText = "Dades actualitzades";
                 
                 const poligons = document.querySelectorAll('.hex-overlay polygon');
+                const imageLayer = document.getElementById('image-layer');
+                imageLayer.innerHTML = ''; // Neteja imatges anteriors
 
                 data.forEach((item, index) => {
                     const nomJugador = item["Propietat"];
+                    const showImage = item["Jugador 1"] == 1; // Condició nou requeriment
                     
                     if (poligons[index]) {
+                        // Color polígon
                         if (nomJugador && colorsJugadors[nomJugador.trim()]) {
                             poligons[index].style.fill = colorsJugadors[nomJugador.trim()];
                         } else {
                             poligons[index].style.fill = "rgba(255, 255, 255, 0)";
+                        }
+
+                        // Dibuixar imatge si cal
+                        if (showImage) {
+                            const center = calcularCentre(poligons[index].getAttribute('points'));
+                            const size = 100; // Mida de la imatge
+                            const img = document.createElementNS("http://www.w3.org/2000/svg", "image");
+                            img.setAttribute("href", IMG_URL);
+                            img.setAttribute("x", center.x - (size/2));
+                            img.setAttribute("y", center.y - (size/2));
+                            img.setAttribute("width", size);
+                            img.setAttribute("height", size);
+                            imageLayer.appendChild(img);
                         }
                     }
                 });
@@ -165,20 +185,14 @@
             document.body.appendChild(script);
         }
 
-        // Codi per gestionar el botó d'alternar ombrejat
         const btnToggle = document.getElementById('btnToggle');
         const overlay = document.querySelector('.hex-overlay');
 
         btnToggle.addEventListener('click', () => {
             overlay.classList.toggle('hidden');
-            if (overlay.classList.contains('hidden')) {
-                btnToggle.innerText = "Mostrar Ombrejat";
-            } else {
-                btnToggle.innerText = "Amagar Ombrejat";
-            }
+            btnToggle.innerText = overlay.classList.contains('hidden') ? "Mostrar Ombrejat" : "Amagar Ombrejat";
         });
 
-        // Inicialització
         carregarDades();
         setInterval(carregarDades, 5000);
     </script>
