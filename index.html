@@ -113,18 +113,17 @@
 
     <script>
         const scriptUrl = "https://script.google.com/macros/s/AKfycby2bGAmT1O1DMj8QiQ8PVLtndy1OJTEsAUmBj0aTvfHxsWfVV2OL38zqkwF2WbZlPyh/exec";
-        const IMG_URL = "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/d67b2c23490d7f80ea46d51a912e1d23fe28b7f1/GER.jpg";
-
-        const colorsJugadors = {
-            "Jugador 1": "rgba(255, 0, 0, 0.33)",
-            "Jugador 2": "rgba(255, 255, 0, 0.33)",
-            "Jugador 3": "rgba(255, 0, 100, 0.33)",
-            "Jugador 4": "rgba(0, 0, 255, 0.33)",
-            "Jugador 5": "rgba(0, 255, 255, 0.33)",
-            "Jugador 6": "rgba(100, 0, 100, 0.33)"
+        
+        // Diccionari de configuració d'imatges i colors
+        const configJugadors = {
+            "Jugador 1": { color: "rgba(255, 0, 0, 0.33)", img: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/174822030ea36b9f1cd147610f00fec3ed465937/GER.jpg" },
+            "Jugador 2": { color: "rgba(255, 255, 0, 0.33)", img: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/174822030ea36b9f1cd147610f00fec3ed465937/ITA.jpg" },
+            "Jugador 3": { color: "rgba(255, 0, 100, 0.33)", img: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/174822030ea36b9f1cd147610f00fec3ed465937/SU.jpg" },
+            "Jugador 4": { color: "rgba(0, 0, 255, 0.33)", img: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/174822030ea36b9f1cd147610f00fec3ed465937/UK.jpg" },
+            "Jugador 5": { color: "rgba(0, 255, 255, 0.33)", img: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/174822030ea36b9f1cd147610f00fec3ed465937/US1.jpg" },
+            "Jugador 6": { color: "rgba(100, 0, 100, 0.33)", img: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/174822030ea36b9f1cd147610f00fec3ed465937/US2.jpg" }
         };
 
-        // Funció per calcular el centre d'un polígon a partir dels seus punts
         function calcularCentre(pointsString) {
             const points = pointsString.split(' ').map(p => p.split(',').map(Number));
             const xSum = points.reduce((sum, p) => sum + p[0], 0);
@@ -142,32 +141,33 @@
                 
                 const poligons = document.querySelectorAll('.hex-overlay polygon');
                 const imageLayer = document.getElementById('image-layer');
-                imageLayer.innerHTML = ''; // Neteja imatges anteriors
+                imageLayer.innerHTML = ''; 
 
                 data.forEach((item, index) => {
                     const nomJugador = item["Propietat"];
-                    const showImage = item["Jugador 1"] == 1; // Condició nou requeriment
                     
                     if (poligons[index]) {
-                        // Color polígon
-                        if (nomJugador && colorsJugadors[nomJugador.trim()]) {
-                            poligons[index].style.fill = colorsJugadors[nomJugador.trim()];
+                        // 1. Gestionar color polígon
+                        if (nomJugador && configJugadors[nomJugador.trim()]) {
+                            poligons[index].style.fill = configJugadors[nomJugador.trim()].color;
                         } else {
                             poligons[index].style.fill = "rgba(255, 255, 255, 0)";
                         }
 
-                        // Dibuixar imatge si cal
-                        if (showImage) {
-                            const center = calcularCentre(poligons[index].getAttribute('points'));
-                            const size = 100; // Mida de la imatge
-                            const img = document.createElementNS("http://www.w3.org/2000/svg", "image");
-                            img.setAttribute("href", IMG_URL);
-                            img.setAttribute("x", center.x - (size/2));
-                            img.setAttribute("y", center.y - (size/2));
-                            img.setAttribute("width", size);
-                            img.setAttribute("height", size);
-                            imageLayer.appendChild(img);
-                        }
+                        // 2. Gestionar imatges per cada columna de jugador
+                        Object.keys(configJugadors).forEach(jugadorClau => {
+                            if (item[jugadorClau] == 1) {
+                                const center = calcularCentre(poligons[index].getAttribute('points'));
+                                const size = 100;
+                                const img = document.createElementNS("http://www.w3.org/2000/svg", "image");
+                                img.setAttribute("href", configJugadors[jugadorClau].img);
+                                img.setAttribute("x", center.x - (size/2));
+                                img.setAttribute("y", center.y - (size/2));
+                                img.setAttribute("width", size);
+                                img.setAttribute("height", size);
+                                imageLayer.appendChild(img);
+                            }
+                        });
                     }
                 });
 
@@ -176,7 +176,7 @@
             };
 
             script.onerror = function() {
-                status.innerText = "Error de connexió al carregar";
+                status.innerText = "Error de connexió";
                 delete window[callbackName];
                 script.remove();
             };
