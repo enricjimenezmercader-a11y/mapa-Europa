@@ -9,7 +9,8 @@
         .map-container { position: relative; width: 95vw; max-width: 1600px; }
         .map-container img { width: 100%; height: auto; display: block; }
         .hex-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
-        .hex-overlay polygon { fill: transparent; stroke: #ffffff; stroke-width: 4; stroke-linejoin: round; transition: fill 0.5s ease; }
+        /* Línies totalment transparents: stroke: transparent */
+        .hex-overlay polygon { fill: rgba(255, 255, 255, 0); stroke: transparent; stroke-width: 0; stroke-linejoin: round; transition: fill 0.5s ease; }
         #status { position: fixed; top: 10px; left: 10px; color: white; background: rgba(0,0,0,0.7); padding: 10px; z-index: 1000; border-radius: 5px; }
     </style>
 </head>
@@ -94,20 +95,23 @@
     </div>
 
     <script>
-        const scriptUrl = "https://script.google.com/macros/s/AKfycby2bGAmT1O1DMj8QiQ8PVLtndy1OJTEsAUmBj0aTvfHxsWfVV2OL38zqkwF2WbZlPyh/exec";
+        // ATENCIÓ: Assegura't de mantenir la teva URL correcta de Google Apps Script
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbxQiSpFVT70zxxl_s_aBqObHRLomx_mRDO_fp7CyfpFAnmuF4-BhBBf-tyiaV2x0Rzc/exec";
 
-        // Funció per generar colors deterministes segons el nom
-        function stringToColor(str) {
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
-            return `hsla(${Math.abs(hash % 360)}, 70%, 50%, 0.6)`;
-        }
+        // Diccionari de colors pels jugadors (amb 0.6 d'opacitat per deixar veure el mapa)
+        const colorsJugadors = {
+            "Jugador 1": "rgba(255, 100, 0, 0.6)",
+            "Jugador 2": "rgba(255, 100, 100, 0.6)",
+            "Jugador 3": "rgba(255, 0, 100, 0.6)",
+            "Jugador 4": "rgba(0, 100, 255, 0.6)",
+            "Jugador 5": "rgba(100, 100, 255, 0.6)",
+            "Jugador 6": "rgba(100, 0, 255, 0.6)"
+        };
 
         function carregarDades() {
             const status = document.getElementById('status');
             const callbackName = 'callback_' + Math.round(100000 * Math.random());
             
-            // Declarem l'etiqueta script a l'inici
             const script = document.createElement('script');
             
             window[callbackName] = function(data) {
@@ -117,21 +121,23 @@
 
                 data.forEach((item, index) => {
                     const nomJugador = item["Propietat"];
+                    
                     if (poligons[index]) {
-                        if (nomJugador && nomJugador.trim() !== "") {
-                            poligons[index].style.fill = stringToColor(nomJugador);
+                        // Comprovem si hi ha un nom i si aquest nom està al diccionari de colors
+                        if (nomJugador && colorsJugadors[nomJugador.trim()]) {
+                            poligons[index].style.fill = colorsJugadors[nomJugador.trim()];
                         } else {
-                            poligons[index].style.fill = "transparent";
+                            // Hexàgon no vàlid / buit: Blanc, opacitat 0%
+                            poligons[index].style.fill = "rgba(255, 255, 255, 0)";
                         }
                     }
                 });
 
-                // NETEJA: Un cop s'han pintat les dades, esborrem la memòria i l'etiqueta HTML
+                // NETEJA
                 delete window[callbackName];
                 script.remove();
             };
 
-            // NETEJA en cas d'error de xarxa (per no acumular crides fallides)
             script.onerror = function() {
                 status.innerText = "Error de connexió al carregar";
                 delete window[callbackName];
