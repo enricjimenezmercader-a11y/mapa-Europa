@@ -96,6 +96,7 @@
                 <polygon points="3086.17,1552.63 3009.33,1685.71 2855.67,1685.71 2778.83,1552.63 2855.67,1419.55 3009.33,1419.55"/>
                 <polygon points="3086.17,1818.79 3009.33,1951.87 2855.67,1951.87 2778.83,1818.79 2855.67,1685.71 3009.33,1685.71"/>
             </g>
+            <g id="type-layer"></g> 
             <g id="image-layer"></g>
         </svg>
     </div>
@@ -112,7 +113,6 @@
             "Jugador 6": { color: "rgba(100, 0, 100, 0.33)", img: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/174822030ea36b9f1cd147610f00fec3ed465937/US2.jpg" }
         };
 
-        // Diccionari afegit amb les rutes transformades a 'raw.githubusercontent'
         const configTipus = {
             "Zona agrícola/Pla": "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/75e55d1169cac4b1b61e571b87807f3dca695f01/_Zona%20agricola.png",
             "Desert/Montanya/Tundra": "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/75e55d1169cac4b1b61e571b87807f3dca695f01/_Muntanya.png",
@@ -129,7 +129,6 @@
             return { x: xSum / points.length, y: ySum / points.length };
         }
 
-        // Nova funció per calcular el punt Y més baix de l'hexàgon
         function calcularVoraInferior(pointsString) {
             const points = pointsString.split(' ').map(p => p.split(',').map(Number));
             return Math.max(...points.map(p => p[1]));
@@ -144,13 +143,17 @@
                 status.innerText = "Dades actualitzades";
                 
                 const poligons = document.querySelectorAll('#polygon-layer polygon');
+                const typeLayer = document.getElementById('type-layer');
                 const imageLayer = document.getElementById('image-layer');
+                
+                // Netegem les capes per tornar-les a generar
+                typeLayer.innerHTML = '';
                 imageLayer.innerHTML = ''; 
 
                 data.forEach((item, index) => {
                     if (!poligons[index]) return;
 
-                    // 1. Gestionar color polígon (basat en la propietat principal)
+                    // 1. Gestionar color polígon (ombrejat)
                     const nomPropietari = item["Propietat"];
                     poligons[index].style.fill = (nomPropietari && configJugadors[nomPropietari]) 
                         ? configJugadors[nomPropietari].color 
@@ -159,25 +162,23 @@
                     const pointsStr = poligons[index].getAttribute('points');
                     const center = calcularCentre(pointsStr);
 
-                    // 2. Afegir icona corresponent a la columna "tipus"
-                    const nomTipus = item["Tipus"]; // Si la columna es diu "Tipus", canvia-ho aquí
+                    // 2. Afegir icona de tipus de terreny
+                    const nomTipus = item["tipus"]; 
                     if (nomTipus && configTipus[nomTipus]) {
-                        const midaIcona = 80; // Pots ajustar la mida d'aquesta icona aquí
+                        const midaIcona = 120; // 50% més gran (abans 80)
                         const voraInferiorY = calcularVoraInferior(pointsStr);
                         
                         const imgTipus = document.createElementNS("http://www.w3.org/2000/svg", "image");
                         imgTipus.setAttribute("href", configTipus[nomTipus]);
-                        // Centrat horitzontalment:
                         imgTipus.setAttribute("x", center.x - (midaIcona / 2));
-                        // 10 píxels per sobre del costat inferior:
-                        imgTipus.setAttribute("y", voraInferiorY - midaIcona - 10);
+                        imgTipus.setAttribute("y", voraInferiorY - midaIcona - 3); // A 3px del costat inferior
                         imgTipus.setAttribute("width", midaIcona);
                         imgTipus.setAttribute("height", midaIcona);
                         
-                        imageLayer.appendChild(imgTipus);
+                        typeLayer.appendChild(imgTipus);
                     }
 
-                    // 3. Recollir totes les unitats presents en aquest hexàgon
+                    // 3. Recollir totes les unitats presents
                     let unitsInHex = [];
                     Object.keys(configJugadors).forEach(jugadorClau => {
                         let count = parseInt(item[jugadorClau]) || 0;
