@@ -9,7 +9,7 @@
         .map-container { position: relative; width: 95vw; max-width: 1600px; }
         .map-container img { width: 100%; height: auto; display: block; }
         .hex-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
-        .hex-overlay polygon { fill: transparent; stroke: #ffffff; stroke-width: 4; stroke-linejoin: round; transition: fill 0.5s ease; }
+        .hex-overlay polygon { fill: transparent; stroke: #ffffff; stroke-width: 0; stroke-linejoin: round; transition: fill 0.5s ease; }
         #status { position: fixed; top: 10px; left: 10px; color: white; background: rgba(0,0,0,0.7); padding: 10px; z-index: 1000; border-radius: 5px; }
     </style>
 </head>
@@ -98,12 +98,12 @@
 
 // Diccionari de colors pels jugadors (amb 0.6 d'opacitat per deixar veure el mapa)
         const colorsJugadors = {
-            "Jugador 1": "rgba(255, 100, 0, 0.6)",
-            "Jugador 2": "rgba(255, 100, 100, 0.6)",
-            "Jugador 3": "rgba(255, 0, 100, 0.6)",
-            "Jugador 4": "rgba(0, 100, 255, 0.6)",
-            "Jugador 5": "rgba(100, 100, 255, 0.6)",
-            "Jugador 6": "rgba(100, 0, 255, 0.6)"
+            "Jugador 1": "rgba(255, 100, 0, 0.3)",
+            "Jugador 2": "rgba(255, 100, 100, 0.3)",
+            "Jugador 3": "rgba(255, 0, 100, 0.3)",
+            "Jugador 4": "rgba(0, 100, 255, 0.3)",
+            "Jugador 5": "rgba(100, 100, 255, 0.3)",
+            "Jugador 6": "rgba(100, 0, 255, 0.3)"
         };
 
         function carregarDades() {
