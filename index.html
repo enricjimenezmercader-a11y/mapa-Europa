@@ -10,12 +10,33 @@
         .map-container img { width: 100%; height: auto; display: block; }
         .hex-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
         .hex-overlay polygon { fill: transparent; stroke: #ffffff; stroke-width: 0; stroke-linejoin: round; transition: fill 0.5s ease; }
+        
         #status { position: fixed; top: 10px; left: 10px; color: white; background: rgba(0,0,0,0.7); padding: 10px; z-index: 1000; border-radius: 5px; }
+        
+        /* Estils nous pel botó */
+        #btnToggle { 
+            position: fixed; 
+            top: 60px; 
+            left: 10px; 
+            z-index: 1000; 
+            padding: 10px; 
+            cursor: pointer; 
+            background: rgba(0,0,0,0.7); 
+            color: white; 
+            border: 1px solid white; 
+            border-radius: 5px; 
+        }
+
+        /* Classe per ocultar l'SVG */
+        .hidden { 
+            display: none; 
+        }
     </style>
 </head>
 <body>
 
     <div id="status">Esperant dades...</div>
+    <button id="btnToggle">Amagar Ombrejat</button>
 
     <div class="map-container">
         <img src="https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/4c8c2114cb475d3b50a3c7eb8c0e3c99423b66b6/Mapa%20europa-Layout5.jpg" alt="Mapa">
@@ -96,7 +117,7 @@
     <script>
         const scriptUrl = "https://script.google.com/macros/s/AKfycby2bGAmT1O1DMj8QiQ8PVLtndy1OJTEsAUmBj0aTvfHxsWfVV2OL38zqkwF2WbZlPyh/exec";
 
-// Diccionari de colors pels jugadors (amb 0.6 d'opacitat per deixar veure el mapa)
+        // Diccionari de colors pels jugadors
         const colorsJugadors = {
             "Jugador 1": "rgba(255, 0, 0, 0.33)",
             "Jugador 2": "rgba(255, 255, 0, 0.33)",
@@ -106,6 +127,7 @@
             "Jugador 6": "rgba(100, 0, 100, 0.33)"
         };
 
+        // Funció per carregar dades
         function carregarDades() {
             const status = document.getElementById('status');
             const callbackName = 'callback_' + Math.round(100000 * Math.random());
@@ -121,22 +143,18 @@
                     const nomJugador = item["Propietat"];
                     
                     if (poligons[index]) {
-                        // Comprovem si hi ha un nom i si aquest nom està al diccionari de colors
                         if (nomJugador && colorsJugadors[nomJugador.trim()]) {
                             poligons[index].style.fill = colorsJugadors[nomJugador.trim()];
                         } else {
-                            // Hexàgon no vàlid / buit: Blanc, opacitat 0%
                             poligons[index].style.fill = "rgba(255, 255, 255, 0)";
                         }
                     }
                 });
 
-                // NETEJA: Un cop s'han pintat les dades, esborrem la memòria i l'etiqueta HTML
                 delete window[callbackName];
                 script.remove();
             };
 
-            // NETEJA en cas d'error de xarxa (per no acumular crides fallides)
             script.onerror = function() {
                 status.innerText = "Error de connexió al carregar";
                 delete window[callbackName];
@@ -147,6 +165,20 @@
             document.body.appendChild(script);
         }
 
+        // Codi per gestionar el botó d'alternar ombrejat
+        const btnToggle = document.getElementById('btnToggle');
+        const overlay = document.querySelector('.hex-overlay');
+
+        btnToggle.addEventListener('click', () => {
+            overlay.classList.toggle('hidden');
+            if (overlay.classList.contains('hidden')) {
+                btnToggle.innerText = "Mostrar Ombrejat";
+            } else {
+                btnToggle.innerText = "Amagar Ombrejat";
+            }
+        });
+
+        // Inicialització
         carregarDades();
         setInterval(carregarDades, 5000);
     </script>
