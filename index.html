@@ -114,7 +114,6 @@
     <script>
         const scriptUrl = "https://script.google.com/macros/s/AKfycby2bGAmT1O1DMj8QiQ8PVLtndy1OJTEsAUmBj0aTvfHxsWfVV2OL38zqkwF2WbZlPyh/exec";
         
-        // URL corregida a raw.githubusercontent.com per evitar errors de renderització SVG
         const urlFlotilla = "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/327d1977991ee277441f6f2fd580418eb5ba8030/Fl-N.png";
         
         const configJugadors = {
@@ -220,14 +219,13 @@
                         imageLayer.appendChild(img);
                     });
 
-                    // Nova funcionalitat: Comprovar la columna P (o clau "P")
-                    const valorColumnaP = item["P"] || item["p"];
-                    if (valorColumnaP === true || valorColumnaP === "TRUE" || valorColumnaP === "True" || valorColumnaP === "true") {
+                    // Nova funcionalitat: Comprovar la columna "Icona FL-N"
+                    const valorIcona = item["Icona FL-N"] || item["icona fl-n"];
+                    if (valorIcona === true || valorIcona === "TRUE" || valorIcona === "True" || valorIcona === "true") {
                         const midaFlag = 100;
                         const imgFlag = document.createElementNS("http://www.w3.org/2000/svg", "image");
                         imgFlag.setAttributeNS("http://www.w3.org/1999/xlink", "href", urlFlotilla);
                         imgFlag.setAttribute("href", urlFlotilla);
-                        // Situada al centre de l'hexàgon (pots ajustar x i y si ho prefereixes desplaçat)
                         imgFlag.setAttribute("x", center.x - (midaFlag / 2));
                         imgFlag.setAttribute("y", center.y - (midaFlag / 2));
                         imgFlag.setAttribute("width", midaFlag);
