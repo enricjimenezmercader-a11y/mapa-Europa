@@ -235,13 +235,12 @@
                         imageLayer.appendChild(img);
                     });
 
-                    // Nova funcionalitat: Escalada de la flotilla per encaixar amb el contorn exterior (Punt A)
+                    // Nova funcionalitat: Escalada de la flotilla amb factor 1.5 per arribar al punt A
                     const valorIcona = item["Icona FL-N"] || item["icona fl-n"];
                     if (valorIcona === true || valorIcona === "TRUE" || valorIcona === "True" || valorIcona === "true") {
                         const bounds = calcularBounds(pointsStr);
                         
-                        // Factor d'escala per adaptar la imatge des de la línia fina (B) fins a la línia gruixuda (A)
-                        const escala = 1.25; // Pots ajustar lleugerament aquest valor (p.ex. 1.2 o 1.3) si cal més precisió
+                        const escala = 1.5; // Ajustat a 1.5 per coincidir amb el contorn exterior (Punt A)
                         
                         const widthEscalat = bounds.width * escala;
                         const heightEscalat = bounds.height * escala;
