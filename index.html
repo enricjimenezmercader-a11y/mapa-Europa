@@ -114,9 +114,9 @@
     <script>
         const scriptUrl = "https://script.google.com/macros/s/AKfycby2bGAmT1O1DMj8QiQ8PVLtndy1OJTEsAUmBj0aTvfHxsWfVV2OL38zqkwF2WbZlPyh/exec";
         
-        // Configuració de totes les icones i columnes associades al Google Sheets amb els nous enllaços actualitzats
+        // Configuració de totes les icones i columnes associades al Google Sheets amb l'enllaç de Icona FL-N actualitzat
         const configIcons = [
-            { col: "Icona FL-N", url: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/327d1977991ee277441f6f2fd580418eb5ba8030/Fl-N.png" },
+            { col: "Icona FL-N", url: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/d000e6afe2dd63d5e8fdce84203fa3a20d9a5612/Fletxa-Nord.png" },
             { col: "Icona FL-NE", url: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/abe214b650a407558bf527d4decbf43c4bef8898/Fletxa-Nordest.png" },
             { col: "Icona FL-SE", url: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/abe214b650a407558bf527d4decbf43c4bef8898/Fletxa-Sudest.png" },
             { col: "Icona FL-S", url: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/0de76b26d1227692d833fc164f61e2b469c4c618/Fletxa-Sud.png" },
@@ -256,8 +256,10 @@
 
                     // Comprovar i dibuixar totes les icones configurades de la llista
                     configIcons.forEach(iconCfg => {
-                        const valorIcona = item[iconCfg.col] || item[iconCfg.col.toLowerCase()];
-                        if (valorIcona === true || valorIcona === "TRUE" || valorIcona === "True" || valorIcona === "true") {
+                        const valorIcona = item[iconCfg.col] || iconCfg.col.toLowerCase();
+                        // Assegurem la comprovació correcta del valor booleà o string 'true'
+                        const val = item[iconCfg.col];
+                        if (val === true || val === "TRUE" || val === "True" || val === "true") {
                             const bounds = calcularBounds(pointsStr);
                             const escala = 1.5; 
                             
