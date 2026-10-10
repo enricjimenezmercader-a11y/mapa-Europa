@@ -146,6 +146,23 @@
             return Math.max(...points.map(p => p[1]));
         }
 
+        // Funció per calcular l'amplada i alçada exacta de l'hexàgon a partir dels seus punts
+        function calcularBounds(pointsString) {
+            const points = pointsString.trim().split(/\s+/).map(p => p.split(',').map(Number));
+            const xs = points.map(p => p[0]);
+            const ys = points.map(p => p[1]);
+            const minX = Math.min(...xs);
+            const maxX = Math.max(...xs);
+            const minY = Math.min(...ys);
+            const maxY = Math.max(...ys);
+            return {
+                x: minX,
+                y: minY,
+                width: maxX - minX,
+                height: maxY - minY
+            };
+        }
+
         function carregarDades() {
             const status = document.getElementById('status');
             const callbackName = 'callback_' + Math.round(100000 * Math.random());
@@ -219,17 +236,17 @@
                         imageLayer.appendChild(img);
                     });
 
-                    // Nova funcionalitat: Comprovar la columna "Icona FL-N" amb la mida escalada desitjada
+                    // Nova funcionalitat: Escalar la imatge de la flotilla adaptant-la exactament a la mida de l'hexàgon
                     const valorIcona = item["Icona FL-N"] || item["icona fl-n"];
                     if (valorIcona === true || valorIcona === "TRUE" || valorIcona === "True" || valorIcona === "true") {
-                        const midaFlag = 220; // Pots augmentar o disminuir aquest valor si cal ajustar-ho més
+                        const bounds = calcularBounds(pointsStr);
                         const imgFlag = document.createElementNS("http://www.w3.org/2000/svg", "image");
                         imgFlag.setAttributeNS("http://www.w3.org/1999/xlink", "href", urlFlotilla);
                         imgFlag.setAttribute("href", urlFlotilla);
-                        imgFlag.setAttribute("x", center.x - (midaFlag / 2));
-                        imgFlag.setAttribute("y", center.y - (midaFlag / 2));
-                        imgFlag.setAttribute("width", midaFlag);
-                        imgFlag.setAttribute("height", midaFlag);
+                        imgFlag.setAttribute("x", bounds.x);
+                        imgFlag.setAttribute("y", bounds.y);
+                        imgFlag.setAttribute("width", bounds.width);
+                        imgFlag.setAttribute("height", bounds.height);
                         flagLayer.appendChild(imgFlag);
                     }
                 });
