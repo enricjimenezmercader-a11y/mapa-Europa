@@ -107,11 +107,15 @@
             </g>
             <g id="type-layer"></g>
             <g id="image-layer"></g>
+            <g id="flag-layer"></g>
         </svg>
     </div>
 
     <script>
         const scriptUrl = "https://script.google.com/macros/s/AKfycby2bGAmT1O1DMj8QiQ8PVLtndy1OJTEsAUmBj0aTvfHxsWfVV2OL38zqkwF2WbZlPyh/exec";
+        
+        // URL corregida a raw.githubusercontent.com per evitar errors de renderització SVG
+        const urlFlotilla = "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/327d1977991ee277441f6f2fd580418eb5ba8030/Fl-N.png";
         
         const configJugadors = {
             "Jugador 1": { color: "rgba(255, 0, 0, 0.25)", img: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/174822030ea36b9f1cd147610f00fec3ed465937/GER.jpg" },
@@ -153,10 +157,12 @@
                 const poligons = document.querySelectorAll('#polygon-layer polygon');
                 const typeLayer = document.getElementById('type-layer');
                 const imageLayer = document.getElementById('image-layer');
+                const flagLayer = document.getElementById('flag-layer');
                 const infoBox = document.getElementById('info-box');
                 
                 typeLayer.innerHTML = '';
                 imageLayer.innerHTML = ''; 
+                flagLayer.innerHTML = '';
 
                 data.forEach((item, index) => {
                     if (!poligons[index]) return;
@@ -213,6 +219,21 @@
                         img.setAttribute("height", size);
                         imageLayer.appendChild(img);
                     });
+
+                    // Nova funcionalitat: Comprovar la columna P (o clau "P")
+                    const valorColumnaP = item["P"] || item["p"];
+                    if (valorColumnaP === true || valorColumnaP === "TRUE" || valorColumnaP === "True" || valorColumnaP === "true") {
+                        const midaFlag = 100;
+                        const imgFlag = document.createElementNS("http://www.w3.org/2000/svg", "image");
+                        imgFlag.setAttributeNS("http://www.w3.org/1999/xlink", "href", urlFlotilla);
+                        imgFlag.setAttribute("href", urlFlotilla);
+                        // Situada al centre de l'hexàgon (pots ajustar x i y si ho prefereixes desplaçat)
+                        imgFlag.setAttribute("x", center.x - (midaFlag / 2));
+                        imgFlag.setAttribute("y", center.y - (midaFlag / 2));
+                        imgFlag.setAttribute("width", midaFlag);
+                        imgFlag.setAttribute("height", midaFlag);
+                        flagLayer.appendChild(imgFlag);
+                    }
                 });
                 delete window[callbackName];
                 script.remove();
