@@ -114,11 +114,12 @@
     <script>
         const scriptUrl = "https://script.google.com/macros/s/AKfycby2bGAmT1O1DMj8QiQ8PVLtndy1OJTEsAUmBj0aTvfHxsWfVV2OL38zqkwF2WbZlPyh/exec";
         
-        // Configuració de totes les icones i les seves columnes associades al Google Sheets
+        // Configuració de totes les icones i columnes associades al Google Sheets
         const configIcons = [
             { col: "Icona FL-N", url: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/327d1977991ee277441f6f2fd580418eb5ba8030/Fl-N.png" },
             { col: "Icona FL-NE", url: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/abe214b650a407558bf527d4decbf43c4bef8898/Fletxa-Nordest.png" },
             { col: "Icona FL-SE", url: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/abe214b650a407558bf527d4decbf43c4bef8898/Fletxa-Sudest.png" },
+            { col: "Icona FL-S", url: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/0de76b26d1227692d833fc164f61e2b469c4c618/Fletxa-Sud.png" },
             { col: "Icona FL-SO", url: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/abe214b650a407558bf527d4decbf43c4bef8898/Fletxa-Sudoest.png" },
             { col: "Icona FL-NO", url: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/abe214b650a407558bf527d4decbf43c4bef8898/Fletxa-Nordoest.png" },
             { col: "Icona fortificacio", url: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/abe214b650a407558bf527d4decbf43c4bef8898/Fortificacio.png" },
@@ -131,7 +132,7 @@
             { col: "Icona Blitzkrieg SE", url: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/abe214b650a407558bf527d4decbf43c4bef8898/BL-SE.png" },
             { col: "Icona Blitzkrieg S", url: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/abe214b650a407558bf527d4decbf43c4bef8898/BL-S.png" },
             { col: "Icona Blitzkrieg SO", url: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/abe214b650a407558bf527d4decbf43c4bef8898/BL-SO.png" },
-            { col: "Icona Blitzkrieg NO", url: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/abe214b650a407558bf527d4bef8898/BL-NO.png" }
+            { col: "Icona Blitzkrieg NO", url: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/abe214b650a407558bf527d4decbf43c4bef8898/BL-NO.png" }
         ];
         
         const configJugadors = {
@@ -253,12 +254,12 @@
                         imageLayer.appendChild(img);
                     });
 
-                    // Iteració automàtica per comprovar i dibuixar qualsevol icona activa de la llista
+                    // Comprovar i dibuixar totes les icones configurades de la llista
                     configIcons.forEach(iconCfg => {
                         const valorIcona = item[iconCfg.col] || item[iconCfg.col.toLowerCase()];
                         if (valorIcona === true || valorIcona === "TRUE" || valorIcona === "True" || valorIcona === "true") {
                             const bounds = calcularBounds(pointsStr);
-                            const escala = 1.5; // Factor d'escala aprovat
+                            const escala = 1.5; 
                             
                             const widthEscalat = bounds.width * escala;
                             const heightEscalat = bounds.height * escala;
