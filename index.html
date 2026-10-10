@@ -114,7 +114,8 @@
     <script>
         const scriptUrl = "https://script.google.com/macros/s/AKfycby2bGAmT1O1DMj8QiQ8PVLtndy1OJTEsAUmBj0aTvfHxsWfVV2OL38zqkwF2WbZlPyh/exec";
         
-        const urlFlotilla = "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/327d1977991ee277441f6f2fd580418eb5ba8030/Fl-N.png";
+        // Nou URL de la icona actualitzat (Fletxa-Nord.png) en format raw
+        const urlFlotilla = "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/173bc09601d96972da780273e3674eb1c09a9ee8/Fletxa-Nord.png";
         
         const configJugadors = {
             "Jugador 1": { color: "rgba(255, 0, 0, 0.25)", img: "https://raw.githubusercontent.com/enricjimenezmercader-a11y/mapa-Europa/174822030ea36b9f1cd147610f00fec3ed465937/GER.jpg" },
@@ -235,12 +236,12 @@
                         imageLayer.appendChild(img);
                     });
 
-                    // Nova funcionalitat: Escalada de la flotilla amb factor 1.5 per arribar al punt A
+                    // Nova funcionalitat: Escalada de la nova icona amb factor 1.5
                     const valorIcona = item["Icona FL-N"] || item["icona fl-n"];
                     if (valorIcona === true || valorIcona === "TRUE" || valorIcona === "True" || valorIcona === "true") {
                         const bounds = calcularBounds(pointsStr);
                         
-                        const escala = 1.5; // Ajustat a 1.5 per coincidir amb el contorn exterior (Punt A)
+                        const escala = 1.5; 
                         
                         const widthEscalat = bounds.width * escala;
                         const heightEscalat = bounds.height * escala;
