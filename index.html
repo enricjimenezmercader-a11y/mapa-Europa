@@ -219,10 +219,10 @@
                         imageLayer.appendChild(img);
                     });
 
-                    // Nova funcionalitat: Comprovar la columna "Icona FL-N"
+                    // Nova funcionalitat: Comprovar la columna "Icona FL-N" amb la mida escalada desitjada
                     const valorIcona = item["Icona FL-N"] || item["icona fl-n"];
                     if (valorIcona === true || valorIcona === "TRUE" || valorIcona === "True" || valorIcona === "true") {
-                        const midaFlag = 100;
+                        const midaFlag = 220; // Pots augmentar o disminuir aquest valor si cal ajustar-ho més
                         const imgFlag = document.createElementNS("http://www.w3.org/2000/svg", "image");
                         imgFlag.setAttributeNS("http://www.w3.org/1999/xlink", "href", urlFlotilla);
                         imgFlag.setAttribute("href", urlFlotilla);
