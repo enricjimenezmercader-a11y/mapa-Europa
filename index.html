@@ -51,7 +51,7 @@
             color: white;
             padding: 10px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            display: none; /* Amagat per defecte fins que K9 sigui 1 */
+            display: none; /* Amagat per defecte fins que CH2 sigui 1 */
         }
 
         #side-table-container table {
@@ -258,29 +258,29 @@
             window[callbackName] = function(response) {
                 status.innerText = "Dades actualitzades";
 
-                // Gestió de dades o de l'estructura JSON rebuda des de l'Apps Script
-                let data = response.data || response; // Hexàgons i mapa
-                let k9Value = response.k9Value !== undefined ? response.k9Value : (response.K9 || response.k9);
-                let resolucions = response.resolucions || response.ordres || [];
+                let data = response.data || response;
+                // Obtenim CH2 (cel·la de control global del full principal)
+                let ch2Value = response.ch2Value !== undefined ? response.ch2Value : (response.CH2 || response.ch2);
 
-                // --- GESTIÓ DE LA TAULA LATERAL CONDICIONAL (K9 === 1) ---
+                // --- GESTIÓ DE LA TAULA LATERAL CONDICIONAL (CH2 === 1) ---
                 const tableContainer = document.getElementById('side-table-container');
                 const tableBody = document.getElementById('side-table-body');
                 
-                if (String(k9Value) === "1" || k9Value === 1) {
+                if (String(ch2Value) === "1" || ch2Value === 1) {
                     tableContainer.style.display = "block";
-                    tableBody.innerHTML = ""; // Neteja la taula anterior
+                    tableBody.innerHTML = ""; // Neteja la taula
 
-                    if (Array.isArray(resolucions)) {
-                        resolucions.forEach(row => {
-                            // Comprova si la fila té informació a les columnes G, H o L
-                            const valG = row.G || row.colG || row[0] || "";
-                            const valH = row.H || row.colH || row[1] || "";
-                            const valL = row.L || row.colL || row[2] || "";
+                    if (Array.isArray(data)) {
+                        data.forEach(item => {
+                            // Extraiem els valors de les columnes CI, CJ i CK
+                            const valCI = item["CI"] || item["ci"] || item[Object.keys(item).find(k => k.toUpperCase() === "CI")] || "";
+                            const valCJ = item["CJ"] || item["cj"] || item[Object.keys(item).find(k => k.toUpperCase() === "CJ")] || "";
+                            const valCK = item["CK"] || item["ck"] || item[Object.keys(item).find(k => k.toUpperCase() === "CK")] || "";
 
-                            if (valG !== "" || valH !== "" || valL !== "") {
+                            // Copia a la taula únicament si alguna de les cel·les té algun valor
+                            if (valCI !== "" || valCJ !== "" || valCK !== "") {
                                 const tr = document.createElement('tr');
-                                tr.innerHTML = `<td>${valG}</td><td>${valH}</td><td>${valL}</td>`;
+                                tr.innerHTML = `<td>${valCI}</td><td>${valCJ}</td><td>${valCK}</td>`;
                                 tableBody.appendChild(tr);
                             }
                         });
@@ -289,7 +289,7 @@
                     tableContainer.style.display = "none";
                 }
 
-                // --- DIBUIX DE LA RETÍCULA I ICONES (Inalterat) ---
+                // --- DIBUIX DE LA RETÍCULA I ICONES ---
                 const poligons = document.querySelectorAll('#polygon-layer polygon');
                 const typeLayer = document.getElementById('type-layer');
                 const imageLayer = document.getElementById('image-layer');
